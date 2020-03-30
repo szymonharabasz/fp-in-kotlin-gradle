@@ -28,6 +28,21 @@ sealed class List<A> {
         return go(p, this)
     }
 
+    fun <B> foldLeft(initial: B, f: (B, A) -> B): B {
+        tailrec fun go(list: List<A>, acc: B): B = when (list) {
+            Nil -> acc
+            is Cons -> if (list.tail.isEmpty()) f(acc, list.head) else go(list.tail, f(acc, list.head))
+        }
+        return go(this, initial)
+    }
+
+    fun reverse(): List<A> = foldLeft(Nil as List<A>) { list, elem -> list.cons(elem) }
+
+    fun init(): List<A> = when (this) {
+        Nil -> Nil as List<A>
+        is Cons -> this.reverse().drop(1).reverse()
+    }
+
     private object Nil : List<Nothing>() {
 
         override fun isEmpty(): Boolean = true

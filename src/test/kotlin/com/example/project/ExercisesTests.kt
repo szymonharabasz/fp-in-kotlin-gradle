@@ -488,5 +488,9 @@ class ExercisesTests {
         fun droppingWhileConditionIsMet() {
             assertEquals("${List(2,3,4,5).dropWhile {it < 5} }", "${List(5)}")
         }
+        @Test
+        fun initOfListIsListWithoutLastElement() {
+            assertEquals("${List(2,3,4,5).init()}", "${List(2,3,4)}")
+        }
     }
 }
