@@ -474,11 +474,11 @@ class ExercisesTests {
         }
         @Test
         fun droppingZeroElementsReturnsTheSameList() {
-            assertEquals("${List(2,3,4,5).drop(0)}", "${List(2,3,4,5)}")
+            assertEquals(List(2,3,4,5).drop(0), List(2,3,4,5))
         }
         @Test
         fun droppingSomeElementsReturnsTruncatedList() {
-            assertEquals("${List(2,3,4,5).drop(2)}", "${List(4,5)}")
+            assertEquals(List(2,3,4,5).drop(2), List(4,5))
         }
         @Test
         fun droppingMoreElementsThanListHasReturnsEmptyList() {
@@ -486,7 +486,7 @@ class ExercisesTests {
         }
         @Test
         fun droppingWhileConditionIsMet() {
-            assertEquals("${List(2,3,4,5).dropWhile {it < 5} }", "${List(5)}")
+            assertEquals(List(2,3,4,5).dropWhile {it < 5}, List(5))
         }
         @Test
         fun initOfListIsListWithoutLastElement() {
@@ -497,16 +497,43 @@ class ExercisesTests {
             assertEquals(2+3+4+5, List(2,3,4,5).sum())
         }
         @Test
+        fun returnsSumOfListElementsWithFoldRight() {
+            assertEquals(2+3+4+5, List(2,3,4,5).sumFoldRight())
+        }
+        @Test
+        fun returnsSumOfListElementsWithCoFoldRight() {
+            assertEquals(2+3+4+5, List(2,3,4,5).sumCoFoldRight())
+        }
+        @Test
         fun returnsProductOfListElements() {
             assertEquals(2*3*4*5, List(2,3,4,5).product())
         }
         @Test
+        @Disabled
         fun returnsListLength() {
             assertEquals(4, List(2,3,4,5).length())
         }
         @Test
         fun lengthIsStackSafe() {
             assertDoesNotThrow { List(0 to 100000).length() }
+        }
+        @Test
+        fun concatReturnsConcatenatedList() {
+            assertEquals(List(1,2,3,4,5,6,7), List(1,2,3,4).concat(List(5,6,7)))
+        }
+        @Test
+        fun flattenedListIsConcatenationOfSublists() {
+            assertEquals(List(1,2,3,4,5,6,7,8,9),
+                    List.flatten(List(List(1,2,3), List(4,5,6), List(7,8,9))))
+        }
+        @Test
+        fun time3returnsListOfElementsMultipliedBy3() {
+            assertEquals(List(3,6,9,12), List(1,2,3,4).times3())
+        }
+        @Test
+        fun doubleToStringReturnsListOfStringRepresentations() {
+            assertEquals(List("1.0", "2.0", "3.0", "4.2"),
+                    List(1.0, 2.0, 3.0, 4.2).doubleToString())
         }
     }
 }
