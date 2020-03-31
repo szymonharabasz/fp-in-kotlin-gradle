@@ -492,5 +492,21 @@ class ExercisesTests {
         fun initOfListIsListWithoutLastElement() {
             assertEquals("${List(2,3,4,5).init()}", "${List(2,3,4)}")
         }
+        @Test
+        fun returnsSumOfListElements() {
+            assertEquals(2+3+4+5, List(2,3,4,5).sum())
+        }
+        @Test
+        fun returnsProductOfListElements() {
+            assertEquals(2*3*4*5, List(2,3,4,5).product())
+        }
+        @Test
+        fun returnsListLength() {
+            assertEquals(4, List(2,3,4,5).length())
+        }
+        @Test
+        fun lengthIsStackSafe() {
+            assertDoesNotThrow { List(0 to 100000).length() }
+        }
     }
 }

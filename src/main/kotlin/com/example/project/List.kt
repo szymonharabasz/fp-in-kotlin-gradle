@@ -9,32 +9,18 @@ sealed class List<A> {
         is Cons -> Cons(a, this.tail)
     }
 
-    fun drop(n: Int): List<A> {
-        tailrec fun go(n: Int, decc: List<A>): List<A> = when (decc) {
-            Nil -> Nil as List<A>
-            is Cons -> when (n) {
-                0 -> decc
-                else -> go(n - 1, decc.tail)
-            }
-        }
-        return go(n, this)
+    fun drop(n: Int): List<A> = drop(n, this)
+
+    fun dropWhile(p: (A) -> Boolean): List<A> = dropWhile(p, this)
+
+    fun <B> foldLeft(initial: B, f: (B, A) -> B): B = foldLeft(this, initial, f)
+
+    fun <B> foldRight(initial: B, f: (A, B) -> B): B = when (this) {
+        Nil -> initial
+        is Cons -> f(head, tail.foldRight(initial, f))
     }
 
-    fun dropWhile(p: (A) -> Boolean): List<A> {
-        tailrec fun go(p: (A) -> Boolean, decc: List<A>): List<A> = when (decc) {
-            Nil -> Nil as List<A>
-            is Cons -> if (p(decc.head)) go(p, decc.tail) else decc
-        }
-        return go(p, this)
-    }
-
-    fun <B> foldLeft(initial: B, f: (B, A) -> B): B {
-        tailrec fun go(list: List<A>, acc: B): B = when (list) {
-            Nil -> acc
-            is Cons -> if (list.tail.isEmpty()) f(acc, list.head) else go(list.tail, f(acc, list.head))
-        }
-        return go(this, initial)
-    }
+    fun length(): Int = foldLeft(0) { n, _ -> n + 1 }
 
     fun reverse(): List<A> = foldLeft(Nil as List<A>) { list, elem -> list.cons(elem) }
 
@@ -75,5 +61,26 @@ sealed class List<A> {
                     Cons(a, list)
                 }
 
+        tailrec fun <A> drop(n: Int, decc: List<A>): List<A> = when (decc) {
+            Nil -> Nil as List<A>
+            is Cons -> when (n) {
+                0 -> decc
+                else -> drop(n - 1, decc.tail)
+            }
+        }
+
+        tailrec fun <A> dropWhile(p: (A) -> Boolean, decc: List<A>): List<A> = when (decc) {
+            Nil -> Nil as List<A>
+            is Cons -> if (p(decc.head)) dropWhile(p, decc.tail) else decc
+        }
+
+        tailrec fun <A, B> foldLeft(list: List<A>, acc: B, f: (B, A) -> B): B = when (list) {
+            Nil -> acc
+            is Cons -> if (list.tail.isEmpty()) f(acc, list.head) else foldLeft(list.tail, f(acc, list.head), f)
+        }
+
     }
 }
+
+fun List<Int>.sum() = this.foldLeft(0) { a, b -> a + b }
+fun List<Int>.product() = this.foldLeft(1) { a, b -> a * b }
