@@ -535,5 +535,13 @@ class ExercisesTests {
             assertEquals(List("1.0", "2.0", "3.0", "4.2"),
                     List(1.0, 2.0, 3.0, 4.2).doubleToString())
         }
+        @Test
+        fun filtersOutEvenElements() {
+            assertEquals(List(1,3,5,7,9), List(1,2,3,4,5,6,7,9,10).filter { it % 2 != 0 })
+        }
+        @Test
+        fun flatMapReturnsCorrectFlatList() {
+            assertEquals(List(1,2,3,4,5,6,7,8), List(1,3,5,7).flatMap { List(it, it + 1)})
+        }
     }
 }

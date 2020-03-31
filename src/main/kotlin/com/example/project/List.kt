@@ -35,6 +35,13 @@ sealed class List<A> {
 
     fun concat(other: List<A>) = Companion.concat(this, other)
 
+    fun <B> map(f: (A) -> B): List<B> = coFoldRight(Nil as List<B>) { elem, list -> list.cons(f(elem)) }
+
+    fun <B> flatMap(f: (A) -> List<B>): List<B> = flatten(map(f))
+
+    fun filter(p: (A) -> Boolean): List<A> = coFoldRight(Nil as List<A>) {
+        elem, list -> if (p(elem)) list.cons(elem) else list }
+
     private object Nil : List<Nothing>() {
 
         override fun isEmpty(): Boolean = true
@@ -117,5 +124,5 @@ fun List<Int>.sumFoldRight() = this.foldRight(0) { a, b -> a + b }
 fun List<Int>.sumCoFoldRight() = this.coFoldRight(0) { a, b -> a + b }
 fun List<Int>.product() = this.foldLeft(1) { a, b -> a * b }
 
-fun List<Int>.times3() = this.foldRight(List<Int>()) { elem, list -> list.cons(elem * 3) }
-fun List<Double>.doubleToString() = this.foldRight(List<String>()) { elem, list -> list.cons(elem.toString()) }
+fun List<Int>.times3() = this.map { it * 3 }
+fun List<Double>.doubleToString() = this.map { it.toString() }
