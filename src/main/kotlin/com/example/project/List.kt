@@ -112,6 +112,7 @@ sealed class List<A> {
     }
 }
 
+fun List<Double>.sum() = this.foldLeft(0.0) { a, b -> a + b }
 fun List<Int>.sum() = this.foldLeft(0) { a, b -> a + b }
 fun List<Int>.sumFoldRight() = this.foldRight(0) { a, b -> a + b }
 fun List<Int>.sumCoFoldRight() = this.coFoldRight(0) { a, b -> a + b }

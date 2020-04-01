@@ -558,5 +558,73 @@ class ExercisesTests {
             val stored = 4
             assertEquals(stored, (Option<Int>(stored).getOrElse(default)))
         }
+        @Test
+        fun mapReturnsNoneForNone() {
+            assertEquals(Option<Int>(), Option<Int>().map { 2 * it })
+        }
+        @Test
+        fun mapReturnsMappedSomeForSome() {
+            assertEquals(Option<Int>(6), Option<Int>(3).map { 2 * it })
+        }
+        @Test
+        fun returnsNoneWhenPredicateNotFulfilled() {
+            assertEquals(Option<Int>(), Option(5).filter { it % 2 == 0 })
+        }
+        @Test
+        fun returnsTheSameWhenPredicateIsFulfilled() {
+            assertEquals(Option(4), Option(4).filter { it % 2 == 0 })
+        }
+        @Test
+        fun returnsMeanOfListOfNumbers() {
+            assertEquals(Option(3.5), mean(List(2.0,3.0,4.0,5.0)))
+        }
+        @Test
+        fun returnsVarianceOfListOfNumbers() {
+            assertEquals(Option(1.25), variance(List(2.0,3.0,4.0,5.0)))
+        }
+        @Test
+        fun liftedFunctionReturnsSomeOfFunctionValue() {
+            val myF: (Int) -> Int = { 3 * it }
+            assertEquals(Option(myF(4)), lift(myF)(Option(4)))
+        }
+        @Test
+        fun liftedFunctionReturnsNoneForArgumentNone() {
+            val myF: (Int) -> Int = { 3 * it }
+            assertEquals(Option<Int>(), lift(myF)(Option<Int>()))
+        }
+        @Test
+        fun liftedFunctionReturnsNoneIfExceptionIsThrown() {
+            val myF: (Int) -> Int = { throw IllegalThreadStateException(); 3 * it }
+            assertEquals(Option<Int>(), lift(myF)(Option<Int>(4)))
+        }
+        @Test
+        fun map3returnsSomeOfFunctionAppliedToArguments() {
+            val f: (Int) -> (Int) -> (Int) -> Int = { x -> { y -> { z -> (2*x + y)*z}}}
+            assertEquals(Option(f(1)(2)(3)), map3(Option(1), Option(2), Option(3), f))
+        }
+        @Test
+        fun map3returnsNoneIfOneOfArgumentsIsNone() {
+            val f: (Int) -> (Int) -> (Int) -> Int = { x -> { y -> { z -> (2*x + y)*z}}}
+            assertEquals(Option<Int>(), map3(Option(1), Option(), Option(3), f))
+        }
+        @Test
+        fun sequenceReturnsSomeOfListIfAllElementsAreSome() {
+            assertEquals(Option(List(1,2,3)), sequence(List(Option(1), Option(2), Option(3))))
+        }
+        @Test
+        fun sequenceReturnsNoneIfOneOfElementsIsNone() {
+            assertEquals(Option<List<Int>>(), sequence(List(Option(1), Option<Int>(), Option(3))))
+        }
+        @Test
+        fun traverseReturnsListOfMappedValues() {
+            val parseWithRadix: (Int) -> (String) -> Int = { radix ->
+                { string ->
+                    Integer.parseInt(string, radix)
+                }
+            }
+            val parse16 = hLift(parseWithRadix(16))
+            assertEquals(Option(List(4,5,6,7,8,9,10,11)),
+                    traverse(List("4","5","6","7","8","9","A","B"), parse16))
+        }
     }
 }
