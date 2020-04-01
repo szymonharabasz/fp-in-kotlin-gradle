@@ -467,6 +467,7 @@ class ExercisesTests {
     }
 
     @Nested
+    @Disabled
     inner class Chapter5 {
         @Test
         fun returnsCorrectStringRepresentationOfList() {
@@ -509,7 +510,6 @@ class ExercisesTests {
             assertEquals(2*3*4*5, List(2,3,4,5).product())
         }
         @Test
-        @Disabled
         fun returnsListLength() {
             assertEquals(4, List(2,3,4,5).length())
         }
@@ -542,6 +542,21 @@ class ExercisesTests {
         @Test
         fun flatMapReturnsCorrectFlatList() {
             assertEquals(List(1,2,3,4,5,6,7,8), List(1,3,5,7).flatMap { List(it, it + 1)})
+        }
+    }
+
+    @Nested
+    inner class Chapter6 {
+        @Test
+        fun getOrElseOnNoneReturnsDefaultValue() {
+            val default = 5
+            assertEquals(default, (Option<Int>().getOrElse(default)))
+        }
+        @Test
+        fun getOrElseOnSomeReturnsContainedValue() {
+            val default = 5
+            val stored = 4
+            assertEquals(stored, (Option<Int>(stored).getOrElse(default)))
         }
     }
 }

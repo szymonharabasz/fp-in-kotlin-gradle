@@ -53,7 +53,7 @@ sealed class List<A> {
         override fun hashCode() = 41
     }
 
-    private class Cons<A>(
+    private data class Cons<A>(
             internal val head: A,
             internal val tail: List<A>
     ) : List<A>() {
@@ -67,13 +67,6 @@ sealed class List<A> {
                     is Nil -> acc
                     is Cons -> toString("$acc${list.head}, ", list.tail)
                 }
-
-        override fun equals(other: Any?) = when (other) {
-            is Cons<*> -> head == other.head && tail == other.tail
-            else -> false
-        }
-
-        override fun hashCode() = head.hashCode() + 41 * tail.hashCode()
     }
 
 
