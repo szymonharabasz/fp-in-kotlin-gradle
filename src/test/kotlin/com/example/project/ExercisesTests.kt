@@ -12,6 +12,8 @@ package com.example.project
 
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import java.lang.Exception
 
 import java.math.BigInteger
 
@@ -546,6 +548,7 @@ class ExercisesTests {
     }
 
     @Nested
+    @Disabled
     inner class Chapter6 {
         @Test
         fun getOrElseOnNoneReturnsDefaultValue() {
@@ -625,6 +628,37 @@ class ExercisesTests {
             val parse16 = hLift(parseWithRadix(16))
             assertEquals(Option(List(4,5,6,7,8,9,10,11)),
                     traverse(List("4","5","6","7","8","9","A","B"), parse16))
+        }
+    }
+
+    @Nested
+    inner class Chapter7 {
+        @Test
+        fun filterReturnsTheOriginalResultIfConditionIsFulfilled() {
+            assertEquals(
+                    com.example.project.result.Result(4),
+                    com.example.project.result.Result(4).filter( {it % 2 == 0} ))
+        }
+        @Test
+        fun filterReturnsFailureWithCorrectStringIfConditionNotFulfilled() {
+            val message = "condition not met"
+            assertEquals(
+                    com.example.project.result.Result.failure<Int>(message),
+                    com.example.project.result.Result(5).filter( {it % 2 == 0}, message ))
+        }
+        @Test
+        fun existsReturnsTrueIfConditionIsFulfilled() {
+            assertEquals(true, com.example.project.result.Result(4).exists {it % 2 == 0})
+        }
+        @Test
+        fun existsReturnsFalseIfConditionNotFulfilled() {
+            assertEquals(false, com.example.project.result.Result(5).exists {it % 2 == 0})
+        }
+        @Test
+        fun failuresWithDifferentExceptionTypesAreNotEqual() {
+            assertNotEquals(
+                    com.example.project.result.Result.failure<Int>(Exception("exception")),
+                    com.example.project.result.Result.failure<Int>(NullPointerException("exception")))
         }
     }
 }
