@@ -13,8 +13,7 @@ package com.example.project
 import com.example.project.option.*
 import com.example.project.result.Result
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.*
 import java.math.BigInteger
 import kotlin.IllegalStateException
 import com.example.project.option.sequence as option_sequence
@@ -773,6 +772,25 @@ class ExercisesTests {
             assertEquals(
                     Result(4),
                     List(2, 3, 4, 5).getAt(2))
+        }
+
+        @Test
+        fun getAtIndex0ReturnsSuccessWithTheValue() {
+            assertEquals(
+                    Result(2),
+                    List(2, 3, 4, 5).getAt(0))
+        }
+
+        @Test
+        fun getAtLastIndexReturnsSuccessWithTheValue() {
+            assertEquals(
+                    Result(5),
+                    List(2, 3, 4, 5).getAt(3))
+        }
+
+        @Test
+        fun getAtNextToLastIndexReturnsFailure() {
+            assertTrue(List(2, 3, 4, 5).getAt(4) is Result.Failure<Int>)
         }
 
         @Test

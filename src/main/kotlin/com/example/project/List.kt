@@ -37,7 +37,6 @@ sealed class List<A> {
         fun go(acc: B, list: List<A>): B = when (list) {
             Nil -> acc
             is Cons -> {
-                println("$list, $acc")
                 if (acc == zero)
                     acc
                 else
@@ -72,17 +71,13 @@ sealed class List<A> {
                 }
             }
 
-    fun getAt(n: Int): Result<A> {
-        tailrec fun go(ind: Int, acc: List<A>): Result<A> = when (acc) {
-            Nil -> Result.failure("Dead codee, should never execute")
-            is Cons -> when {
-                ind < 0 || ind > length -> Result.Failure(IndexOutOfBoundsException())
-                ind == 0 -> Result(acc.head)
-                else -> go(ind - 1, acc.tail)
-            }
-        }
-        return go(n, this)
+    fun getAt(n: Int): Result<A> = when {
+        n < 0 || n >= length -> Result.failure(IndexOutOfBoundsException())
+        else -> foldLeft(MyPair(Result<A>(), n+1), MyPair(Result<A>(), 0), { acc, elem ->
+            MyPair(Result(elem), acc.second - 1)
+        }).first
     }
+
 
     internal object Nil : List<Nothing>() {
 
@@ -178,8 +173,8 @@ fun <A> flattenResult(list: List<Result<A>>): List<A> = list.flatMap {
 }
 
 fun <A> sequence2(list: List<Result<A>>): Result<List<A>> =
-        list.filter{ it !is Result.Empty }.reverse().foldLeft(Result(List())) { list, ra ->
-            map2(ra, list) { a -> { la: List<A> -> la.cons(a) }}
+        list.filter{ it !is Result.Empty }.reverse().foldLeft(Result(List())) { l, ra ->
+            map2(ra, l) { a -> { la: List<A> -> la.cons(a) }}
 }
 
 fun <A, B> traverse(list: List<A>, f: (A) -> Result<B>): Result<List<B>> = list.coFoldRight(Result(List<B>())) { a, l ->
@@ -204,3 +199,13 @@ fun <A, B, C> product(lista: List<A>, listb: List<B>, f: (A) -> (B) -> C) = list
 }
 
 fun <A, B> unzip(list: List<Pair<A, B>>): Pair<List<A>, List<B>> = list.unzip { it }
+
+data class MyPair<B>(val first: Result<B>, val second: Int) {
+    override fun equals(other: Any?): Boolean = when {
+        other == null -> false
+        other::class == this::class -> (other as MyPair<B>).second == second
+        else -> false
+    }
+
+    override fun hashCode(): Int = first.hashCode() + 41*second.hashCode()
+}
