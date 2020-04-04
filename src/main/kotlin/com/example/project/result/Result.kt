@@ -13,15 +13,21 @@ sealed class Result<A>: Serializable {
         }
 
         override fun hashCode(): Int = exception::class.hashCode() + 41 * exception.message.hashCode()
+
+        override fun isEmpty(): Boolean = false
     }
 
     internal data class Success<A>(internal val value: A): Result<A>() {
         override fun toString(): String = "Success($value)"
+        override fun isEmpty(): Boolean = false
     }
 
     internal object Empty: Result<Nothing>() {
         override fun toString(): String = "Empty"
+        override fun isEmpty(): Boolean = true
     }
+
+    abstract fun isEmpty(): Boolean
 
     fun <B> map(f: (A) -> B): Result<B> = when (this) {
         is Success -> try {

@@ -10,12 +10,13 @@
 
 package com.example.project
 
+import com.example.project.option.*
+import com.example.project.result.Result
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
-import java.lang.Exception
-
 import java.math.BigInteger
+import com.example.project.option.sequence as option_sequence
 
 @DisplayName("ALl the tests")
 class ExercisesTests {
@@ -469,7 +470,6 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
     inner class Chapter5 {
         @Test
         fun returnsCorrectStringRepresentationOfList() {
@@ -612,11 +612,11 @@ class ExercisesTests {
         }
         @Test
         fun sequenceReturnsSomeOfListIfAllElementsAreSome() {
-            assertEquals(Option(List(1,2,3)), sequence(List(Option(1), Option(2), Option(3))))
+            assertEquals(Option(List(1,2,3)), option_sequence(List(Option(1), Option(2), Option(3))))
         }
         @Test
         fun sequenceReturnsNoneIfOneOfElementsIsNone() {
-            assertEquals(Option<List<Int>>(), sequence(List(Option(1), Option<Int>(), Option(3))))
+            assertEquals(Option<List<Int>>(), option_sequence(List(Option(1), Option<Int>(), Option(3))))
         }
         @Test
         fun traverseReturnsListOfMappedValues() {
@@ -632,6 +632,7 @@ class ExercisesTests {
     }
 
     @Nested
+    @Disabled
     inner class Chapter7 {
         @Test
         fun filterReturnsTheOriginalResultIfConditionIsFulfilled() {
@@ -659,6 +660,23 @@ class ExercisesTests {
             assertNotEquals(
                     com.example.project.result.Result.failure<Int>(Exception("exception")),
                     com.example.project.result.Result.failure<Int>(NullPointerException("exception")))
+        }
+    }
+
+    @Nested
+    inner class Chapter8 {
+        @Test
+        fun flattenListResurnsListOfValuesOfSuccess() {
+            assertEquals(List(2,4,6,8),
+                    flattenResult(
+                            List(
+                                    Result(2),
+                                    Result(),
+                                    Result(4),
+                                    Result(6),
+                                    Result.failure(NullPointerException("empyt pointer")),
+                                    Result(8)
+                            )))
         }
     }
 }

@@ -1,5 +1,8 @@
 package com.example.project
 
+import com.example.project.result.Result
+import com.example.project.result.map2
+
 sealed class List<A> {
 
     abstract fun isEmpty(): Boolean
@@ -8,6 +11,12 @@ sealed class List<A> {
         Nil -> throw IllegalArgumentException("setHead called on an empty list")
         is Cons -> Cons(a, this.tail)
     }
+
+    abstract val length: Int
+
+    abstract fun headSafe(): Result<A>
+
+    fun lastSafe(): Result<A> = reverse().headSafe()
 
     fun drop(n: Int): List<A> = drop(n, this)
 
@@ -24,7 +33,7 @@ sealed class List<A> {
 
     fun <B> coFoldRight(initial: B, f: (A, B) -> B) = coFoldRight(this.reverse(), initial, initial, f)
 
-    fun length(): Int = foldLeft(0) { n, _ -> n + 1 }
+    fun length(): Int = length
 
     fun reverse(): List<A> = foldLeft(Nil as List<A>) { list, elem -> list.cons(elem) }
 
@@ -51,6 +60,10 @@ sealed class List<A> {
         override fun equals(other: Any?): Boolean = other is Nil
 
         override fun hashCode() = 41
+
+        override val length: Int = 0
+
+        override fun headSafe(): Result<Nothing> = Result.failure("empty list")
     }
 
     private data class Cons<A>(
@@ -67,6 +80,10 @@ sealed class List<A> {
                     is Nil -> acc
                     is Cons -> toString("$acc${list.head}, ", list.tail)
                 }
+
+        override val length: Int = 1 + tail.length
+
+        override fun headSafe(): Result<A> = Result(head)
     }
 
 
@@ -120,3 +137,18 @@ fun List<Int>.product() = this.foldLeft(1) { a, b -> a * b }
 
 fun List<Int>.times3() = this.map { it * 3 }
 fun List<Double>.doubleToString() = this.map { it.toString() }
+
+fun <A> flattenResult(list: List<Result<A>>): List<A> = list.flatMap {
+    ra -> ra.map { List(it) }.getOrElse(List())
+}
+
+fun <A> sequence(list: List<Result<A>>): Result<List<A>> =
+        list.filter{ it !is Result.Empty }.reverse().foldLeft(Result(List())) { list, ra ->
+            map2(ra, list) { a -> { la: List<A> -> la.cons(a) }}
+}
+
+fun <A, B> traverse(list: List<A>, f: (A) -> Result<B>): Result<List<B>> = list.coFoldRight(Result(List<B>())) { a, l ->
+    map2(f(a), l) { b -> { lb: List<B> -> lb.cons(b) }}
+}
+
+fun <A> sequence2(list: List<Result<A>>): Result<List<A>> = traverse(list) { ra: Result<A> -> ra }

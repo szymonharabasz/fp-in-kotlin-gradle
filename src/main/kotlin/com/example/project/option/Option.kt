@@ -1,7 +1,9 @@
-package com.example.project
+package com.example.project.option
 
 import java.lang.Exception
 import kotlin.math.pow
+
+import com.example.project.*
 
 sealed class Option<A> {
 
@@ -55,12 +57,12 @@ sealed class Option<A> {
 }
 
 
-val mean: (List<Double>) -> Option<Double> = { list -> when {
+val mean: (com.example.project.List<Double>) -> Option<Double> = { list -> when {
         list.isEmpty() -> Option()
         else -> Option(list.sum() / list.length())
     } }
 
-val variance: (List<Double>) -> Option<Double> = { list ->
+val variance: (com.example.project.List<Double>) -> Option<Double> = { list ->
     mean(list).flatMap { m -> mean(list.map {x -> (x - m).pow(2) }) }
 }
 
@@ -84,10 +86,12 @@ fun <A, B, C, D> map3(a: Option<A>, b: Option<B>, c: Option<C>, f: (A) -> (B) ->
             b.flatMap { y ->
                 c.map { z -> f(x)(y)(z)} } }
 
-fun <A> sequence(list: List<Option<A>>): Option<List<A>> = list.coFoldRight(Option(List())) { elem, list ->
-    map2(list, elem) { l: List<A> -> { e: A -> l.cons(e) } }
-}
+fun <A> sequence(list: com.example.project.List<Option<A>>): Option<com.example.project.List<A>> =
+        list.coFoldRight(Option(com.example.project.List())) { elem, list ->
+            map2(list, elem) { l: com.example.project.List<A> -> { e: A -> l.cons(e) } }
+        }
 
-fun <A, B> traverse(list: List<A>, f: (A) -> Option<B>): Option<List<B>> = list.coFoldRight(Option(List<B>())) { elem, list ->
-    map2(list, f(elem)) { l: List<B> -> { e: B -> l.cons(e) } }
-}
+fun <A, B> traverse(list: com.example.project.List<A>, f: (A) -> Option<B>): Option<com.example.project.List<B>> =
+        list.coFoldRight(Option(com.example.project.List<B>())) { elem, list ->
+            map2(list, f(elem)) { l: com.example.project.List<B> -> { e: B -> l.cons(e) } }
+        }
