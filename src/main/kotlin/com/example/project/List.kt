@@ -33,6 +33,20 @@ sealed class List<A> {
 
     fun <B> coFoldRight(initial: B, f: (A, B) -> B) = coFoldRight(this.reverse(), initial, initial, f)
 
+    fun <B> foldLeft(identity: B, zero: B, f: (B, A) -> B): B {
+        fun go(acc: B, list: List<A>): B = when (list) {
+            Nil -> acc
+            is Cons -> {
+                println("$list, $acc")
+                if (acc == zero)
+                    acc
+                else
+                    go(f(acc, list.head), list.tail)
+            }
+        }
+        return go(identity, this)
+    }
+
     fun length(): Int = length
 
     fun reverse(): List<A> = foldLeft(Nil as List<A>) { list, elem -> list.cons(elem) }
@@ -58,6 +72,18 @@ sealed class List<A> {
                 }
             }
 
+    fun getAt(n: Int): Result<A> {
+        tailrec fun go(ind: Int, acc: List<A>): Result<A> = when (acc) {
+            Nil -> Result.failure("Dead codee, should never execute")
+            is Cons -> when {
+                ind < 0 || ind > length -> Result.Failure(IndexOutOfBoundsException())
+                ind == 0 -> Result(acc.head)
+                else -> go(ind - 1, acc.tail)
+            }
+        }
+        return go(n, this)
+    }
+
     internal object Nil : List<Nothing>() {
 
         override fun isEmpty(): Boolean = true
@@ -71,6 +97,7 @@ sealed class List<A> {
         override val length: Int = 0
 
         override fun headSafe(): Result<Nothing> = Result.failure("empty list")
+
     }
 
     internal data class Cons<A>(
@@ -91,6 +118,7 @@ sealed class List<A> {
         override val length: Int = 1 + tail.length
 
         override fun headSafe(): Result<A> = Result(head)
+
     }
 
 

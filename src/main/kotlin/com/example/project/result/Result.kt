@@ -8,6 +8,7 @@ sealed class Result<A>: Serializable {
         override fun toString(): String = "Failure(${exception.message})"
 
         override fun equals(other: Any?): Boolean = when (other) {
+            null -> false
             is Failure<*> -> other.exception::class == exception::class && other.exception.message == exception.message
             else -> false
         }

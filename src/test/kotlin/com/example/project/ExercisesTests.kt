@@ -16,6 +16,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import java.math.BigInteger
+import kotlin.IllegalStateException
 import com.example.project.option.sequence as option_sequence
 
 @DisplayName("ALl the tests")
@@ -751,6 +752,67 @@ class ExercisesTests {
                     Pair(List(2,3,4,5), List(5,6,7,8)),
                     unzip(List(Pair(2,5), Pair(3,6), Pair(4, 7), Pair(5, 8)))
             )
+        }
+
+        @Test
+        fun getAtNegativeIndexReturnsFailure() {
+            assertEquals(
+                    Result.failure<Int>(IndexOutOfBoundsException()),
+                    List(2, 3, 4, 5).getAt(-10))
+        }
+
+        @Test
+        fun getAtTooLargeIndexReturnsFailure() {
+            assertEquals(
+                    Result.failure<Int>(IndexOutOfBoundsException()),
+                    List(2, 3, 4, 5).getAt(10))
+        }
+
+        @Test
+        fun getAtCorrectIndexReturnsSuccessWithTheValue() {
+            assertEquals(
+                    Result(4),
+                    List(2, 3, 4, 5).getAt(2))
+        }
+
+        @Test
+        fun foldLeftWithZeroReturnsIdentityForEmptyList() {
+            val zero = 0
+            val identity = 1
+            assertEquals(identity, List<Int>().foldLeft(identity, zero, { b, a -> a * b}))
+        }
+
+        @Test
+        fun foldLeftWithZeroReturnsZeroElementForListContainingItOnly() {
+            val zero = 0
+            val identity = 1
+            assertEquals(zero, List<Int>(zero).foldLeft(identity, zero, { b, a -> a * b}))
+        }
+
+        @Test
+        fun foldLeftWithZeroReturnsFoldedValueForListContainingZeroElement() {
+            val zero = 0
+            val identity = 1
+            val foldedValue = 6*0*9
+            assertEquals(foldedValue, List<Int>(6,0,8).foldLeft(identity, zero, { b, a -> a * b}))
+        }
+
+        @Test
+        fun foldLeftWithZeroReturnsFoldedValueForListNotContainingZeroElement() {
+            val zero = 0
+            val identity = 1
+            val foldedValue = 6*7*8
+            assertEquals(foldedValue, List<Int>(6,7,8).foldLeft(identity, zero, { b, a -> a * b}))
+        }
+
+        @Test
+        fun foldLeftWithZeroIsShortCircuiting() {
+            val zero = 0
+            val identity = 1
+            assertDoesNotThrow { List<Int>(6,7,0,8).foldLeft(identity, zero, { b, a ->
+                if (a > 7) throw IllegalStateException()
+                a * b
+            }) }
         }
     }
 
