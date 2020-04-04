@@ -51,7 +51,14 @@ sealed class List<A> {
     fun filter(p: (A) -> Boolean): List<A> = coFoldRight(Nil as List<A>) {
         elem, list -> if (p(elem)) list.cons(elem) else list }
 
-    private object Nil : List<Nothing>() {
+    fun <A1, A2> unzip(f: (A) -> Pair<A1, A2>): Pair<List<A1>, List<A2>> =
+            coFoldRight(Pair(List.Companion(), List.Companion())) { elem, pairOfLists ->
+                f(elem).let {
+                    Pair(pairOfLists.first.cons(it.first), pairOfLists.second.cons(it.second))
+                }
+            }
+
+    internal object Nil : List<Nothing>() {
 
         override fun isEmpty(): Boolean = true
 
@@ -66,7 +73,7 @@ sealed class List<A> {
         override fun headSafe(): Result<Nothing> = Result.failure("empty list")
     }
 
-    private data class Cons<A>(
+    internal data class Cons<A>(
             internal val head: A,
             internal val tail: List<A>
     ) : List<A>() {
@@ -142,7 +149,7 @@ fun <A> flattenResult(list: List<Result<A>>): List<A> = list.flatMap {
     ra -> ra.map { List(it) }.getOrElse(List())
 }
 
-fun <A> sequence(list: List<Result<A>>): Result<List<A>> =
+fun <A> sequence2(list: List<Result<A>>): Result<List<A>> =
         list.filter{ it !is Result.Empty }.reverse().foldLeft(Result(List())) { list, ra ->
             map2(ra, list) { a -> { la: List<A> -> la.cons(a) }}
 }
@@ -151,4 +158,21 @@ fun <A, B> traverse(list: List<A>, f: (A) -> Result<B>): Result<List<B>> = list.
     map2(f(a), l) { b -> { lb: List<B> -> lb.cons(b) }}
 }
 
-fun <A> sequence2(list: List<Result<A>>): Result<List<A>> = traverse(list) { ra: Result<A> -> ra }
+fun <A> sequence(list: List<Result<A>>): Result<List<A>> = traverse(list) { ra: Result<A> -> ra }
+
+fun <A, B, C> zipWith(lista: List<A>, listb: List<B>, f: (A) -> (B) -> C): List<C> {
+    tailrec fun go(list1: List<A>, list2: List<B>, acc: List<C>): List<C> = when (list1) {
+        List.Nil -> acc
+        is List.Cons -> when (list2) {
+            List.Nil -> acc
+            is List.Cons -> go(list1.tail, list2. tail, acc.cons(f(list1.head)(list2.head)))
+        }
+    }
+    return go(lista, listb, List()).reverse()
+}
+
+fun <A, B, C> product(lista: List<A>, listb: List<B>, f: (A) -> (B) -> C) = lista.flatMap {
+    a -> listb.map { b -> f(a)(b) }
+}
+
+fun <A, B> unzip(list: List<Pair<A, B>>): Pair<List<A>, List<B>> = list.unzip { it }

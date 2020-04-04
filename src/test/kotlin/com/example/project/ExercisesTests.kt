@@ -470,6 +470,7 @@ class ExercisesTests {
     }
 
     @Nested
+    @Disabled
     inner class Chapter5 {
         @Test
         fun returnsCorrectStringRepresentationOfList() {
@@ -666,7 +667,7 @@ class ExercisesTests {
     @Nested
     inner class Chapter8 {
         @Test
-        fun flattenListResurnsListOfValuesOfSuccess() {
+        fun flattenListReturnsListOfValuesOfSuccess() {
             assertEquals(List(2,4,6,8),
                     flattenResult(
                             List(
@@ -678,5 +679,79 @@ class ExercisesTests {
                                     Result(8)
                             )))
         }
+
+        @Test
+        fun sequenceReturnsSuccessForListOfSuccesses() {
+            val input = List(Result(2), Result(3), Result(4), Result(5))
+            val expected = Result(List(2,3,4,5))
+            assertEquals(expected, sequence(input))
+        }
+
+        @Test
+        fun sequenceReturnsFailureForListContainingFailure() {
+            val input = List(
+                    Result(2),
+                    Result.failure(NullPointerException()),
+                    Result(4),
+                    Result.failure(NullPointerException("no element 5")))
+            val expected = Result.failure<Int>(NullPointerException())
+            assertEquals(expected, sequence(input))
+        }
+
+        @Test
+        fun sequenceReturnsFailureForListContainingFailureAndEmpty() {
+            val input = List(
+                    Result(2),
+                    Result(),
+                    Result(4),
+                    Result.failure(NullPointerException("no element 5")))
+            val expected = Result.failure<Int>(NullPointerException())
+            assertEquals(expected, sequence(input))
+        }
+
+        @Test
+        fun ssequenceReturnsEmptyForListContainingSuccessesAndEmpty() {
+            val input = List(
+                    Result(2),
+                    Result(),
+                    Result(4),
+                    Result(5))
+            val expected = Result<Int>()
+            assertEquals(expected, sequence(input))
+        }
+
+        @Test
+        fun lengthOfZippedListIsLengthOfShorterInput() {
+            val list1 = List(2,3,4,5)
+            val list2 = List(3,4,5,6,7,8)
+            assertEquals(Math.min(list1.length(), list2.length()),
+                    zipWith(list1, list2) { _ -> { b: Int -> b }}.length())
+        }
+
+        @Test
+        fun zipWithSumFunctionReturnsListOfSums() {
+            val list1 = List(2,3,4,5)
+            val list2 = List(3,4,5,6)
+            val expected = List(5,7,9,11)
+            assertEquals(expected, zipWith(list1, list2) { a -> { b: Int -> a + b}})
+
+        }
+
+        @Test
+        fun productReturnsListOfAllCombinations() {
+            val list1 = List("a", "b", "c")
+            val list2 = List("d", "e", "f")
+            val expected = List("ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf")
+            assertEquals(expected, product(list1, list2) { a -> { b: String -> a + b}})
+        }
+
+        @Test
+        fun unzipReturnsPairOfLists() {
+            assertEquals(
+                    Pair(List(2,3,4,5), List(5,6,7,8)),
+                    unzip(List(Pair(2,5), Pair(3,6), Pair(4, 7), Pair(5, 8)))
+            )
+        }
     }
+
 }
