@@ -797,14 +797,14 @@ class ExercisesTests {
         fun foldLeftWithZeroReturnsIdentityForEmptyList() {
             val zero = 0
             val identity = 1
-            assertEquals(identity, List<Int>().foldLeft(identity, zero, { b, a -> a * b}))
+            assertEquals(identity, List<Int>().foldLeft(identity, zero, { b, a -> a * b}).first)
         }
 
         @Test
         fun foldLeftWithZeroReturnsZeroElementForListContainingItOnly() {
             val zero = 0
             val identity = 1
-            assertEquals(zero, List<Int>(zero).foldLeft(identity, zero, { b, a -> a * b}))
+            assertEquals(zero, List<Int>(zero).foldLeft(identity, zero, { b, a -> a * b}).first)
         }
 
         @Test
@@ -812,7 +812,7 @@ class ExercisesTests {
             val zero = 0
             val identity = 1
             val foldedValue = 6*0*9
-            assertEquals(foldedValue, List<Int>(6,0,8).foldLeft(identity, zero, { b, a -> a * b}))
+            assertEquals(foldedValue, List<Int>(6,0,8).foldLeft(identity, zero, { b, a -> a * b}).first)
         }
 
         @Test
@@ -820,7 +820,7 @@ class ExercisesTests {
             val zero = 0
             val identity = 1
             val foldedValue = 6*7*8
-            assertEquals(foldedValue, List<Int>(6,7,8).foldLeft(identity, zero, { b, a -> a * b}))
+            assertEquals(foldedValue, List<Int>(6,7,8).foldLeft(identity, zero, { b, a -> a * b}).first)
         }
 
         @Test

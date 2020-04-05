@@ -33,12 +33,12 @@ sealed class List<A> {
 
     fun <B> coFoldRight(initial: B, f: (A, B) -> B) = coFoldRight(this.reverse(), initial, initial, f)
 
-    fun <B> foldLeft(identity: B, zero: B, f: (B, A) -> B): B {
-        fun go(acc: B, list: List<A>): B = when (list) {
-            Nil -> acc
+    fun <B> foldLeft(identity: B, zero: B, f: (B, A) -> B): Pair<B, List<A>> {
+        fun go(acc: B, list: List<A>): Pair<B, List<A>> = when (list) {
+            Nil -> Pair(acc, list)
             is Cons -> {
                 if (acc == zero)
-                    acc
+                    Pair(acc, list)
                 else
                     go(f(acc, list.head), list.tail)
             }
@@ -65,7 +65,7 @@ sealed class List<A> {
         elem, list -> if (p(elem)) list.cons(elem) else list }
 
     fun <A1, A2> unzip(f: (A) -> Pair<A1, A2>): Pair<List<A1>, List<A2>> =
-            coFoldRight(Pair(List.Companion(), List.Companion())) { elem, pairOfLists ->
+            coFoldRight(Pair(Companion(), Companion())) { elem, pairOfLists ->
                 f(elem).let {
                     Pair(pairOfLists.first.cons(it.first), pairOfLists.second.cons(it.second))
                 }
@@ -75,21 +75,14 @@ sealed class List<A> {
         n < 0 || n >= length -> Result.failure(IndexOutOfBoundsException())
         else -> foldLeft(MyPair(Result<A>(), n+1), MyPair(Result<A>(), 0), { acc, elem ->
             MyPair(Result(elem), acc.second - 1)
-        }).first
+        }).first.first
     }
 
-    fun splitAt(n: Int): Pair<List<A>, List<A>> {
-        fun go(ind: Int, acc: Pair<List<A>, List<A>>): Pair<List<A>, List<A>> = when {
-            ind < 0 -> acc
-            else -> {
-                when (val first = acc.first) {
-                    Nil -> acc
-                    is Cons -> go(ind - 1, Pair(first.tail, acc.second.cons(first.head)))
-                }
-            }
-        }
-        val result = go(n - 1, Pair(this, List.Companion()))
-        return Pair(result.second.reverse(), result.first)
+    fun splitAt(n: Int): Pair<List<A>, List<A>> = when {
+        n < 0 -> Pair(Companion<A>(), this)
+        else -> foldLeft(MyPair(Pair(Companion<A>(),this), n), MyPair(Pair(Companion<A>(),this), 0), { acc, elem ->
+            MyPair(Pair(acc.first.first.cons(elem), acc.first.second.drop(1)), acc.second - 1)
+        }).first.first.let { Pair(it.first.reverse(), it.second) }
     }
 
     internal object Nil : List<Nothing>() {
@@ -213,7 +206,7 @@ fun <A, B, C> product(lista: List<A>, listb: List<B>, f: (A) -> (B) -> C) = list
 
 fun <A, B> unzip(list: List<Pair<A, B>>): Pair<List<A>, List<B>> = list.unzip { it }
 
-data class MyPair<B>(val first: Result<B>, val second: Int) {
+data class MyPair<B>(val first: B, val second: Int) {
     override fun equals(other: Any?): Boolean = when {
         other == null -> false
         other::class == this::class -> (other as MyPair<B>).second == second
