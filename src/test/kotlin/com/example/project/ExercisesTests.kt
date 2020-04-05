@@ -832,6 +832,30 @@ class ExercisesTests {
                 a * b
             }) }
         }
+
+        @Test
+        fun splitAtIndexInsideTheListSplitsIt() {
+            assertEquals(Pair(List(2,3,4), List(5,6,7,8)), List(2,3,4,5,6,7,8).splitAt(3))
+        }
+
+        @Test
+        fun splitAtZeroReturnsOriginalListAndEmptyOne() {
+            val list = List(2,3,4,5,6,7,8)
+            assertEquals(Pair(List<Int>(), list), list.splitAt(0))
+        }
+
+        @Test
+        fun splitAtNegativeIndexReturnsOriginalListAndEmptyOne() {
+            val list = List(2,3,4,5,6,7,8)
+            assertEquals(Pair(List<Int>(), list), list.splitAt(0))
+        }
+
+        @Test
+        fun splitIndexAfterLastReturnsEmptyAndOriginalOne() {
+            val list = List(2,3,4,5,6,7,8)
+            assertEquals(Pair(list, List<Int>()), list.splitAt(10))
+        }
+
     }
 
 }

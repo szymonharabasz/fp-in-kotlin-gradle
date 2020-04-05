@@ -78,6 +78,19 @@ sealed class List<A> {
         }).first
     }
 
+    fun splitAt(n: Int): Pair<List<A>, List<A>> {
+        fun go(ind: Int, acc: Pair<List<A>, List<A>>): Pair<List<A>, List<A>> = when {
+            ind < 0 -> acc
+            else -> {
+                when (val first = acc.first) {
+                    Nil -> acc
+                    is Cons -> go(ind - 1, Pair(first.tail, acc.second.cons(first.head)))
+                }
+            }
+        }
+        val result = go(n - 1, Pair(this, List.Companion()))
+        return Pair(result.second.reverse(), result.first)
+    }
 
     internal object Nil : List<Nothing>() {
 
