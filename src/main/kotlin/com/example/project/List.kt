@@ -85,6 +85,32 @@ sealed class List<A> {
         }).first.first.let { Pair(it.first.reverse(), it.second) }
     }
 
+    fun startsWith(sub: List<A>): Boolean {
+        tailrec fun go(list: List<A>, sublist: List<A>, acc: Boolean): Boolean = when {
+            !acc -> acc
+            else -> when (list) {
+                Nil -> when (sublist) {
+                    Nil -> true
+                    else -> false
+                }
+                is Cons -> when (sublist) {
+                    Nil -> acc
+                    is Cons -> go(list.tail, sublist.tail, list.head == sublist.head)
+                }
+            }
+        }
+        return go(this, sub, true)
+    }
+
+    fun hasSublist(sub: List<A>): Boolean {
+        tailrec fun go(list: List<A>): Boolean = when {
+            list.startsWith(sub) -> true
+            list is Cons -> go(list.tail)
+            else -> false
+        }
+        return go(this)
+    }
+
     internal object Nil : List<Nothing>() {
 
         override fun isEmpty(): Boolean = true

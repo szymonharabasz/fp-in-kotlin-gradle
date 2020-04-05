@@ -856,6 +856,29 @@ class ExercisesTests {
             assertEquals(Pair(list, List<Int>()), list.splitAt(10))
         }
 
-    }
+        @Test
+        fun startsWithReturnsTrueIfReceiverStartsWithArgument() {
+            assertTrue(List(2,3,4,5,6,7).startsWith(List(2,3,4)))
+        }
 
+        @Test
+        fun startsWithReturnsFalseIfThereIsDifferentElement() {
+            assertFalse(List(3,4,5,6).startsWith(List(3,4,6,5)))
+        }
+
+        @Test
+        fun startsWithReturnsFailsIfReceiverIsSublistOfArgument() {
+            assertFalse(List(2,3,4).startsWith(List(2,3,4,5,6)))
+        }
+
+        @Test
+        fun hasSublistReturnsTrueIfArgumentIsSublistOfReceiver() {
+            assertTrue(List(2,3,4,5,6,7).hasSublist(List(4,5,6)))
+        }
+
+        @Test
+        fun hasSublistReturnsFalseIfThereIsNotMatchingElement() {
+            assertFalse(List(2,3,4,5,6,7).hasSublist(List(3,4,6,5)))
+        }
+    }
 }
