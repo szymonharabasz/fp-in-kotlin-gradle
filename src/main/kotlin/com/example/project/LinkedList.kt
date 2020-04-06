@@ -3,6 +3,10 @@ package com.example.project
 import com.example.project.option.Option
 import com.example.project.result.Result
 import com.example.project.result.map2
+import javax.swing.plaf.nimbus.NimbusLookAndFeel
+import kotlin.IllegalStateException
+
+typealias LL<A> = LinkedList<LinkedList<A>>
 
 sealed class LinkedList<A> {
 
@@ -92,18 +96,62 @@ sealed class LinkedList<A> {
         }).first.first.let { Pair(it.first.reverse(), it.second) }
     }
 
-    fun splitListAt(n: Int): LinkedList<LinkedList<A>> = splitAt(n).let { LinkedList(it.first, it.second) }
-/*
-    fun divide(depth: Int): LinkedList<LinkedList<A>> {
-        fun go(d: Int, list: LinkedList<A>, acc: LinkedList<LinkedList<A>>): LinkedList<LinkedList<A>> {
+    private fun splitListAt(n: Int): LinkedList<LinkedList<A>> = splitAt(n).let { LinkedList(it.first, it.second) }
+
+    fun divideNotTail(depth: Int): LinkedList<LinkedList<A>> {
+        fun go(d: Int, list: LinkedList<A>): LinkedList<LinkedList<A>> {
             val n = list.length / 2
-            val splitted = list.splitListAt(n)
-            if (d == 1) splitted
-            else go(depth-1, splitted.init(), acc).concat(go(depth-1, splitted.drop(1), acc))
+            if (n == 0) return LinkedList(list)
+            val split = list.splitListAt(n)
+            println("split: $split")
+            return (if (d == 1) split
+            else when (split) {
+                is Cons -> {
+                    when (val splitTail = split.tail) {
+                        is Cons -> go(d - 1, split.head).concat(go(d - 1, splitTail.head))
+                        else -> throw IllegalStateException("should never happen")
+                    }
+                }
+                else -> throw IllegalStateException("should never happen")
+            })
         }
-        return go(depth, this, LinkedList(this))
+        return go(depth, this)
     }
-*/
+
+    fun divide(depth: Int): LinkedList<LinkedList<A>> {
+        tailrec fun go(depths: LinkedList<Int>, acc: LL<A>, decc: LL<A>): LL<A> = when (depths) {
+            is Cons -> when (decc) {
+                is Cons -> {
+                    val d = depths.head
+                    val n = decc.head.length / 2
+                    val split = decc.head.splitListAt(n)
+                    if (split is Cons && split.tail is Cons) {
+                        if (d == 1) {
+                            val nextAcc = when {
+                                split.head == Nil && split.tail.head == Nil -> acc
+                                split.head == Nil -> acc.cons(split.tail.head)
+                                split.tail.head == Nil -> acc.cons(split.head)
+                                else -> acc.cons(split.head).cons(split.tail.head)
+                            }
+                            go (depths.tail, nextAcc, decc.tail)
+                        } else {
+                            go(
+                                    depths.tail.cons(d - 1).cons(d - 1),
+                                    acc,
+                                    decc.tail.cons(split.tail.head).cons(split.head)
+                            )
+                        }
+                    } else {
+                        throw IllegalStateException("should never happen")
+                    }
+                }
+                else -> throw IllegalStateException("should never happen")
+            }
+            else -> acc
+        }
+        return go(LinkedList(depth), LinkedList.Companion(), LinkedList(this)).reverse()
+    }
+
     fun startsWith(sub: LinkedList<A>): Boolean {
         tailrec fun go(list: LinkedList<A>, sublist: LinkedList<A>, acc: Boolean): Boolean = when {
             !acc -> acc

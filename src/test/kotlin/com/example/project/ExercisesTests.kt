@@ -916,5 +916,64 @@ class ExercisesTests {
         fun forAllDetectsThatThereIsOddElement() {
             assertFalse(LinkedList(2,4,6,7,10).forAll { it % 2 == 0 })
         }
+
+        @Test
+        fun divideAtDepth1returnsListOfTwoLists() {
+            assertEquals(2, LinkedList(2,3,4,5,6,7,8,9).divide(1).length)
+        }
+
+        @Test
+        fun divideAtDepth1returnsSplitLists() {
+            assertEquals(
+                    LinkedList(LinkedList(2, 3, 4, 5), LinkedList(6, 7, 8, 9)),
+                    LinkedList(2, 3, 4, 5, 6, 7, 8, 9).divide(1))
+        }
+
+        @Test
+        fun divideAtDepth1returnsSplitListsWhenOriginalHasOddElemwnts() {
+            assertEquals(
+                    LinkedList(LinkedList(2, 3, 4), LinkedList(6, 7, 8, 9)),
+                    LinkedList(2, 3, 4, 6, 7, 8, 9).divide(1))
+        }
+
+        @Test
+        fun divideAtDepth2returnsListOfFourLists() {
+            assertEquals(4, LinkedList(2,3,4,5,6,7,8,9).divide(2).length)
+        }
+
+        @Test
+        fun divideAtDepth2returnsSplitLists() {
+            assertEquals(
+                    LinkedList(LinkedList(2, 3), LinkedList(4, 5), LinkedList(6, 7), LinkedList(8, 9)),
+                    LinkedList(2, 3, 4, 5, 6, 7, 8, 9).divide(2))
+        }
+
+        @Test
+        fun divideAtDepth2returnsSplitListsWhenOriginalHasOddElements() {
+            assertEquals(
+                    LinkedList(LinkedList(2), LinkedList(4, 5), LinkedList(6, 7), LinkedList(8, 9)),
+                    LinkedList(2, 4, 5, 6, 7, 8, 9).divide(2))
+        }
+
+        @Test
+        fun divideAtDepth1ofTwoElementListReturnsTwoOneElementLists() {
+            assertEquals(
+                    LinkedList(LinkedList(2), LinkedList(3)),
+                    LinkedList(2,3).divide(1))
+        }
+
+        @Test
+        fun divideAtDepth1ofOneElementListReturnsOneElementLists() {
+            assertEquals(
+                    LinkedList(LinkedList(2)),
+                    LinkedList(2).divide(1))
+        }
+
+        @Test
+        fun divideAtTooLargeDepthResutnsListOfOneElementLists() {
+            assertEquals(
+                    LinkedList(LinkedList(2), LinkedList(3), LinkedList(4), LinkedList(5), LinkedList(6)),
+                    LinkedList(2,3,4,5,6).divide(4))
+        }
     }
 }
