@@ -665,6 +665,7 @@ class ExercisesTests {
     }
 
     @Nested
+    @Disabled
     inner class Chapter8 {
         @Test
         fun flattenListReturnsListOfValuesOfSuccess() {
@@ -1006,6 +1007,34 @@ class ExercisesTests {
         @Test
         fun groupByReturnsCorrectValueFOrGivenKey() {
             assertEquals(Result(LinkedList(2,5,8,11)), LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.get(2))
+        }
+    }
+
+    @Nested
+    inner class Chapter9 {
+        @Test
+        fun lazyReturnsCorrectValues() {
+            var nFirstCalls = 0
+            var nSecondCalls = 0
+            val first = Lazy {
+                nFirstCalls += 1
+                true
+            }
+            val second = Lazy<Boolean> {
+                nSecondCalls += 1
+                throw IllegalStateException()
+            }
+            fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
+
+            assertEquals(0, nFirstCalls)
+            assertEquals(0, nSecondCalls)
+
+            assertTrue(first() || second())
+            assertTrue(first() || second())
+            assertTrue(or(first, second))
+
+            assertEquals(1, nFirstCalls)
+            assertEquals(0, nSecondCalls)
         }
     }
 }
