@@ -4,6 +4,8 @@ import com.example.project.option.Option
 import com.example.project.result.Result
 import com.example.project.result.map2
 import com.sun.jdi.connect.spi.TransportService
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
 import javax.swing.plaf.nimbus.NimbusLookAndFeel
 import kotlin.IllegalStateException
 
@@ -50,6 +52,44 @@ sealed class LinkedList<A> {
             }
         }
         return go(identity, this)
+    }
+
+    fun <B> parFoldLeft(
+            es: ExecutorService,
+            identity: B,
+            f: (B, A) -> B,
+            m: (B, B) -> B
+    ): Result<B> = try {
+            val result: LinkedList<B> = divide(10).map { list: LinkedList<A> ->
+                es.submit<B> { list.foldLeft(identity, f) }
+            }.map { fb ->
+                try {
+                    fb.get()
+                } catch (e: InterruptedException) {
+                    throw RuntimeException(e)
+                } catch (e: ExecutionException) {
+                    throw RuntimeException(e)
+                }
+            }
+            Result(result.foldLeft(identity, m))
+        } catch (e: Exception) {
+            Result.failure<B>(e)
+        }
+
+    fun <B> parMap(es: ExecutorService, g: (A) -> B): Result<LinkedList<B>> = try {
+        val result: LinkedList<B> = this.map { es.submit<B> { g(it) } }.map { fb ->
+            try {
+                fb.get()
+            } catch (e: InterruptedException) {
+                throw RuntimeException(e)
+            } catch (e: ExecutionException) {
+                throw RuntimeException(e)
+            }
+        }
+        Result(result)
+
+    } catch (e: Exception) {
+        Result.failure<LinkedList<B>>(e)
     }
 
     fun exists(p: (A) -> Boolean): Boolean = foldLeft(false, true) {
