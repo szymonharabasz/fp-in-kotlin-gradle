@@ -3,6 +3,7 @@ package com.example.project
 import com.example.project.option.Option
 import com.example.project.result.Result
 import com.example.project.result.map2
+import com.sun.jdi.connect.spi.TransportService
 import javax.swing.plaf.nimbus.NimbusLookAndFeel
 import kotlin.IllegalStateException
 
@@ -98,26 +99,6 @@ sealed class LinkedList<A> {
 
     private fun splitListAt(n: Int): LinkedList<LinkedList<A>> = splitAt(n).let { LinkedList(it.first, it.second) }
 
-    fun divideNotTail(depth: Int): LinkedList<LinkedList<A>> {
-        fun go(d: Int, list: LinkedList<A>): LinkedList<LinkedList<A>> {
-            val n = list.length / 2
-            if (n == 0) return LinkedList(list)
-            val split = list.splitListAt(n)
-            println("split: $split")
-            return (if (d == 1) split
-            else when (split) {
-                is Cons -> {
-                    when (val splitTail = split.tail) {
-                        is Cons -> go(d - 1, split.head).concat(go(d - 1, splitTail.head))
-                        else -> throw IllegalStateException("should never happen")
-                    }
-                }
-                else -> throw IllegalStateException("should never happen")
-            })
-        }
-        return go(depth, this)
-    }
-
     fun divide(depth: Int): LinkedList<LinkedList<A>> {
         tailrec fun go(depths: LinkedList<Int>, acc: LL<A>, decc: LL<A>): LL<A> = when (depths) {
             is Cons -> when (decc) {
@@ -176,6 +157,12 @@ sealed class LinkedList<A> {
             else -> false
         }
         return go(this)
+    }
+
+    fun <B> groupBy(f: (A) -> B): MyLinkedMap<B, LinkedList<A>> = coFoldRight(MyLinkedMap<B, LinkedList<A>>()) { a, map ->
+        f(a).let {
+            map.set(it, map.get(it).getOrElse(LinkedList.Companion<A>()).cons(a))
+        }
     }
 
     internal object Nil : LinkedList<Nothing>() {
@@ -324,4 +311,32 @@ data class MyPair<B>(val first: B, val second: Int) {
     }
 
     override fun hashCode(): Int = first.hashCode() + 41*second.hashCode()
+}
+
+class MyLinkedMap<K, V> {
+    private val list: LinkedList<Pair<K, V>>
+    constructor() {
+        this.list = LinkedList.Companion()
+    }
+
+    private constructor(l: LinkedList<Pair<K, V>>) {
+        this.list = l
+    }
+
+    fun hasKey(key: K): Boolean = list.exists { it.first == key }
+
+    fun get(key: K): Result<V> = list.dropWhile { it.first != key }.headSafe().map { it.second }
+
+    fun set(key: K, value: V): MyLinkedMap<K, V> = if (hasKey(key)) {
+        MyLinkedMap(list.foldLeft(LinkedList<Pair<K, V>>()) {
+            acc, elem -> if (elem.first == key) acc.cons(Pair(key, value))
+            else acc.cons(elem)
+        })
+    } else {
+        MyLinkedMap(list.cons(Pair(key, value)))
+    }
+
+    fun keys(): LinkedList<K> = list.map { it.first }
+
+    fun values(): LinkedList<V> = list.map { it.second }
 }

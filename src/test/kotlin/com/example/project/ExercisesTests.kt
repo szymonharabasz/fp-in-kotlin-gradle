@@ -975,5 +975,37 @@ class ExercisesTests {
                     LinkedList(LinkedList(2), LinkedList(3), LinkedList(4), LinkedList(5), LinkedList(6)),
                     LinkedList(2,3,4,5,6).divide(4))
         }
+
+        @Test
+        fun keyPresentAfterAdding() {
+            assertTrue(MyLinkedMap<Int, Int>().set(2, 3).set(3, 4).hasKey(2))
+        }
+
+        @Test
+        fun newValueForKeyAfterReset() {
+            assertEquals(Result(5), MyLinkedMap<Int, Int>().set(2, 3).set(3, 4).set(2 ,5).get(2))
+        }
+
+        @Test
+        fun lengthOfKeysListIsCorrect() {
+            assertEquals(3, LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.keys().length)
+        }
+
+        @Test
+        fun lengthOfValuesListIsCorrect() {
+            assertEquals(3, LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.values().length)
+        }
+
+        @Test
+        fun groupByReturnsMapWithAllKeys() {
+            assertTrue(LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.keys().exists { it == 0 })
+            assertTrue(LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.keys().exists { it == 1 })
+            assertTrue(LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.keys().exists { it == 2 })
+        }
+
+        @Test
+        fun groupByReturnsCorrectValueFOrGivenKey() {
+            assertEquals(Result(LinkedList(2,5,8,11)), LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.get(2))
+        }
     }
 }
