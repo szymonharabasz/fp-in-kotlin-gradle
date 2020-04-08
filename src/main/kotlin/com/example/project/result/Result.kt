@@ -7,10 +7,16 @@ sealed class Result<A>: Serializable {
     internal data class Failure<A>(internal val exception: RuntimeException): Result<A>() {
         override fun toString(): String = "Failure(${exception.message})"
 
-        override fun equals(other: Any?): Boolean = when (other) {
-            null -> false
-            is Failure<*> -> other.exception::class == exception::class && other.exception.message == exception.message
-            else -> false
+        override fun equals(other: Any?): Boolean {
+            println("this = $this, other = $other, ${other is Failure<*>}")
+            val result = when (other) {
+                null -> false
+                // is Failure<*> -> other.exception::class == exception::class && other.exception.message == exception.message
+                is Failure<*> -> true
+                else -> false
+            }
+            println("result $result")
+            return result
         }
 
         override fun hashCode(): Int = exception::class.hashCode() + 41 * exception.message.hashCode()

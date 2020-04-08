@@ -41,6 +41,8 @@ sealed class LinkedList<A> {
 
     fun <B> coFoldRight(initial: B, f: (A, B) -> B) = coFoldRight(this.reverse(), initial, initial, f)
 
+    fun <B> coFoldRight(initial: B, zero: B, f: (A, B) -> B) = coFoldRight(this.reverse(), initial, zero, initial, f)
+
     fun <B> foldLeft(identity: B, zero: B, f: (B, A) -> B): Pair<B, LinkedList<A>> {
         fun go(acc: B, list: LinkedList<A>): Pair<B, LinkedList<A>> = when (list) {
             Nil -> Pair(acc, list)
@@ -280,6 +282,41 @@ sealed class LinkedList<A> {
             }
         }
 
+        private tailrec fun <A, B> coFoldRight(
+                list: LinkedList<A>,
+                initial: B,
+                zero: B,
+                acc: B,
+                f: (A, B) -> B): Pair<B, LinkedList<A>> =
+                when (list) {
+                    Nil -> Pair(acc, list)
+                    is Cons -> {
+                        println("acc = $acc, zero = $zero")
+                        if (acc == zero) {
+                            Pair(acc, list)
+                        } else {0
+                            coFoldRight(list.tail, initial, zero, f(list.head, acc), f)
+                        }
+                    }
+                }
+
+        /*
+
+
+    fun <B> foldLeft(identity: B, zero: B, f: (B, A) -> B): Pair<B, LinkedList<A>> {
+        fun go(acc: B, list: LinkedList<A>): Pair<B, LinkedList<A>> = when (list) {
+            Nil -> Pair(acc, list)
+            is Cons -> {
+                if (acc == zero)
+                    Pair(acc, list)
+                else
+                    go(f(acc, list.head), list.tail)
+            }
+        }
+        return go(identity, this)
+    }
+
+         */
         fun <A> concat(a: LinkedList<A>, b: LinkedList<A>): LinkedList<A> = foldLeft(a.reverse(), b, { list, elem -> list.cons(elem) })
 
     }
@@ -302,10 +339,16 @@ fun <A> sequence2(list: LinkedList<Result<A>>): Result<LinkedList<A>> =
         list.filter{ it !is Result.Empty }.reverse().foldLeft(Result(LinkedList())) { l, ra ->
             map2(ra, l) { a -> { la: LinkedList<A> -> la.cons(a) }}
 }
-
+/*
 fun <A, B> traverse(list: LinkedList<A>, f: (A) -> Result<B>): Result<LinkedList<B>> = list.coFoldRight(Result(LinkedList<B>())) { a, l ->
     map2(f(a), l) { b -> { lb: LinkedList<B> -> lb.cons(b) }}
 }
+*/
+
+fun <A, B> traverse(list: LinkedList<A>, f: (A) -> Result<B>): Result<LinkedList<B>> =
+        list.reverse().coFoldRight(Result(LinkedList<B>()), Result()) { a, l ->
+            map2(f(a), l) { b -> { lb: LinkedList<B> -> lb.cons(b) } }
+        }.first
 
 fun <A> sequence(list: LinkedList<Result<A>>): Result<LinkedList<A>> = traverse(list) { ra: Result<A> -> ra }
 

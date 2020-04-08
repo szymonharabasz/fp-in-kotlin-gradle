@@ -17,12 +17,14 @@ import org.junit.jupiter.api.Assertions.*
 import java.math.BigInteger
 import kotlin.IllegalStateException
 import com.example.project.option.sequence as option_sequence
+import org.mockito.Mockito.*
+import java.io.PrintStream
 
 @DisplayName("ALl the tests")
 class ExercisesTests {
-
+    /*
     @Nested
-    @Disabled
+   // @Disabled
     inner class Chapter3 {
         @Nested
         @DisplayName("Exercise 3.1")
@@ -138,7 +140,7 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
+   // @Disabled
     inner class Chapter4 {
         @Nested
         @DisplayName("Exercise 4.1")
@@ -470,7 +472,7 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
+   // @Disabled
     inner class Chapter5 {
         @Test
         fun returnsCorrectStringRepresentationOfList() {
@@ -549,7 +551,7 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
+   // @Disabled
     inner class Chapter6 {
         @Test
         fun getOrElseOnNoneReturnsDefaultValue() {
@@ -633,7 +635,7 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
+   // @Disabled
     inner class Chapter7 {
         @Test
         fun filterReturnsTheOriginalResultIfConditionIsFulfilled() {
@@ -665,7 +667,7 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
+   // @Disabled
     inner class Chapter8 {
         @Test
         fun flattenListReturnsListOfValuesOfSuccess() {
@@ -1009,32 +1011,58 @@ class ExercisesTests {
             assertEquals(Result(LinkedList(2,5,8,11)), LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.get(2))
         }
     }
-
+*/
     @Nested
     inner class Chapter9 {
+        /*
         @Test
         fun lazyReturnsCorrectValues() {
-            var nFirstCalls = 0
-            var nSecondCalls = 0
+
+            val fooBar = mock(FooBar::class.java)
+
             val first = Lazy {
-                nFirstCalls += 1
+                fooBar.hello(1)
                 true
             }
             val second = Lazy<Boolean> {
-                nSecondCalls += 1
+                fooBar.hello(2)
                 throw IllegalStateException()
             }
             fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
-
-            assertEquals(0, nFirstCalls)
-            assertEquals(0, nSecondCalls)
 
             assertTrue(first() || second())
             assertTrue(first() || second())
             assertTrue(or(first, second))
 
-            assertEquals(1, nFirstCalls)
-            assertEquals(0, nSecondCalls)
+            verify(fooBar, times(1)).hello(1)
+            verify(fooBar, times(0)).hello(2)
+
+        }
+*/
+        @Test
+        fun sequenceResultIsEscaping() {
+            val fooBar = mock(FooBar::class.java)
+
+            sequenceResult(LinkedList(
+                    Lazy<Int> { val n = 1; fooBar.hello(n); n },
+                    Lazy<Int> { val n = 2; fooBar.hello(n); n },
+                    Lazy<Int> { val n = 3; fooBar.hello(n); n },
+                    Lazy<Int> { val n = 4; fooBar.hello(n); throw NullPointerException(); n },
+                    Lazy<Int> { val n = 5; fooBar.hello(n); n },
+                    Lazy<Int> { val n = 6; fooBar.hello(n); n }
+            ))()
+
+            verify(fooBar, times(1)).hello(1)
+            verify(fooBar, times(1)).hello(2)
+            verify(fooBar, times(1)).hello(3)
+            verify(fooBar, times(1)).hello(4)
+            verify(fooBar, times(0)).hello(5)
+            verify(fooBar, times(0)).hello(6)
+
         }
     }
+}
+
+interface FooBar {
+    fun hello(n: Int)
 }
