@@ -23,9 +23,13 @@ sealed class Stream<A> {
         return go(n, this)
     }
 
-    fun takeWhile(p: (A) -> Boolean): Stream<A> = when (this) {
-        Empty -> this
-        is Cons -> if (p(hd())) Cons(hd, Lazy{ tl().takeWhile(p) }) else Empty as Stream<A>
+    fun takeWhile(p: (A) -> Boolean): Stream<A> = this.foldRight(Lazy{ Stream.Companion<A>() }) { a ->
+        { lsa: Lazy<Stream<A>> ->
+            {
+                if (p(a)) cons(Lazy { a }, lsa) else Empty as Stream<A>
+            }()
+        }
+
     }
 
     fun dropWhile(p: (A) -> Boolean): Stream<A> {

@@ -291,7 +291,6 @@ sealed class LinkedList<A> {
                 when (list) {
                     Nil -> Pair(acc, list)
                     is Cons -> {
-                        println("acc = $acc, zero = $zero")
                         if (acc == zero) {
                             Pair(acc, list)
                         } else {0

@@ -8,14 +8,12 @@ sealed class Result<A>: Serializable {
         override fun toString(): String = "Failure(${exception.message})"
 
         override fun equals(other: Any?): Boolean {
-            println("this = $this, other = $other, ${other is Failure<*>}")
             val result = when (other) {
                 null -> false
                 // is Failure<*> -> other.exception::class == exception::class && other.exception.message == exception.message
                 is Failure<*> -> true
                 else -> false
             }
-            println("result $result")
             return result
         }
 

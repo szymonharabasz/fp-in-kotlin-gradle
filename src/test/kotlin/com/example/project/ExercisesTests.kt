@@ -1120,6 +1120,21 @@ class ExercisesTests {
             )
         }
 
+        @Test
+        fun foldRightWorksForIntegers() {
+            assertEquals(
+                    2+4+8+16+32,
+                    Stream.iterate(2) { 2 * it }.takeAtMost(5).foldRight(Lazy { 0 }) { el ->
+                        { acc ->
+                            {
+                                println("$el $acc")
+                                el + acc()
+                            }()
+                        }
+                    })
+
+        }
+
     }
 }
 
