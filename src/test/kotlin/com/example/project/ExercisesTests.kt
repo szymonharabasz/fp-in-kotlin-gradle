@@ -1135,6 +1135,59 @@ class ExercisesTests {
 
         }
 
+        @Test
+        fun headSafeOfEmptyStreamReturnsFailure() {
+            assertEquals(Result.failure<Int>("stream is empty"), Stream.Companion<Int>().headSafe())
+        }
+
+        @Test
+        fun headSafeOfNonEmptyStreamReturnsSuccessWithHead() {
+            assertEquals(Result(128), Stream.iterate(2) { 2 * it }.dropAtMost(6).headSafe())
+        }
+
+        @Test
+        fun mapReturnsMappedStream() {
+            assertEquals(
+                    LinkedList(2*2, 4*4, 8*8, 16*16, 32*32, 64*64),
+                    Stream.iterate(2) { 2 * it }.map { it * it }.takeAtMost(6).toList()
+            )
+        }
+
+        @Test
+        fun filterReturnsStreamWithElementsFulfillingCondition() {
+            assertEquals(
+                    LinkedList(2,8,16,32,128,256,512,2048),
+                    Stream.iterate(2) { 2 * it }.filter { it % 10 != 4}.takeAtMost(8).toList()
+            )
+        }
+
+        @Test
+        fun appendReturnsStreamWithAppendedValue() {
+            val toAppend = 4096
+            val stream = Stream.iterate(2) { 2 * it }.takeAtMost(8)
+            val second = Lazy { Stream.from(toAppend).takeAtMost(1) }
+            assertEquals(
+                    stream.toList().reverse().cons(toAppend).reverse(),
+                    stream.append(second).toList()
+            )
+        }
+
+        @Test
+        fun flatMapReturnsMergedStream() {
+            assertEquals(
+                    LinkedList(2,3,4,5,6,7,8,9,10,11),
+                    Stream.iterate(2) { it + 2 }.flatMap { Stream.from(it).takeAtMost(2) }
+                            .takeAtMost(10).toList()
+            )
+        }
+
+        @Test
+        fun fibsReturnsStreamOfFibonacciNumbers() {
+            assertEquals(
+                    LinkedList(1, 1, 2, 3, 5, 8, 13, 21, 34),
+                    fibs().takeAtMost(9).toList()
+            )
+        }
     }
 }
 

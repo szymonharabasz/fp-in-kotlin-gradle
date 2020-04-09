@@ -40,6 +40,29 @@ sealed class Stream<A> {
         return go (this)
     }
 
+    fun <B> map(f: (A) -> B): Stream<B> = foldRight(Lazy{ Stream.Companion<B>() }) { a ->
+        { lsb -> cons(Lazy{ f(a) }, lsb) }
+    }
+
+    fun <B> flatMap(f: (A) -> Stream<B>): Stream<B> = foldRight(Lazy{ Stream.Companion<B>() }) { a ->
+        { lsb -> f(a).append(lsb) }
+    }
+
+    fun filter(p: (A) -> Boolean): Stream<A> = foldRight(Lazy { Empty as Stream<A> }) { a ->
+        { lsa: Lazy<Stream<A>> ->
+            if (p(a)) cons(Lazy{ a }, lsa ) else lsa()
+        }
+    }
+
+    fun find(p: (A) -> Boolean): Result<A> = filter(p).head()
+
+    fun append(stream: Lazy<Stream<A>>): Stream<A> =
+            foldRight(stream) { a ->
+                { lsa: Lazy<Stream<A>> ->
+                    cons(Lazy { a }, lsa)
+                }
+            }
+
     fun toList(): LinkedList<A> = Companion.toList(this, LinkedList()).reverse()
 
     fun exists(p: (A) -> Boolean): Boolean {
@@ -49,6 +72,8 @@ sealed class Stream<A> {
         }
         return go(this)
     }
+
+    fun headSafe(): Result<A> = foldRight(Lazy{ Result.failure<A>("stream is empty") }) { a -> { Result(a) } }
 
     fun <B> foldRight(z: Lazy<B>, f: (A) -> (Lazy<B>) -> B): B = when (this) {
         Empty -> z()
@@ -93,3 +118,5 @@ sealed class Stream<A> {
         fun <A> iterate(seed: A, f: (A) -> A): Stream<A> = cons(Lazy{ seed }, Lazy{ iterate(f(seed), f) })
     }
 }
+
+fun fibs(): Stream<Int> = Stream.iterate<Pair<Int,Int>>(Pair(1,1)){ Pair(it.second, it.second + it.first) }.map { it.first }
