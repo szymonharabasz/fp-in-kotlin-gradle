@@ -126,4 +126,4 @@ sealed class Stream<A> {
     }
 }
 
-fun fibs(): Stream<Int> = Stream.iterate<Pair<Int,Int>>(Pair(1,1)){ Pair(it.second, it.second + it.first) }.map { it.first }
+fun fibs(): Stream<Int> = Stream.unfold(Pair(1,1)){ Result(Pair(it.first, Pair(it.second, it.second + it.first))) }
