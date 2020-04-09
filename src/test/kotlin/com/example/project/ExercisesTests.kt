@@ -1188,6 +1188,17 @@ class ExercisesTests {
                     fibs().takeAtMost(9).toList()
             )
         }
+
+        @Test
+        fun fromAndDropWhileAreStackSafe() {
+            assertDoesNotThrow { Stream.from(1).dropWhile { it % 1000 == 0 }.takeAtMost(10).toList() }
+        }
+
+        @Test
+        @Disabled
+        fun filterIsStackSafeWithLongSeriesOfRejectedValues() {
+            assertDoesNotThrow { Stream.from(1).filter { it % 2000 == 0 }.takeAtMost(1).toList() }
+        }
     }
 }
 

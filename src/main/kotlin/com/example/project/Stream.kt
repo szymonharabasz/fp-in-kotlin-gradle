@@ -48,9 +48,9 @@ sealed class Stream<A> {
         { lsb -> f(a).append(lsb) }
     }
 
-    fun filter(p: (A) -> Boolean): Stream<A> = foldRight(Lazy { Empty as Stream<A> }) { a ->
+    fun filter(p: (A) -> Boolean): Stream<A> = dropWhile { !p(it) }.foldRight(Lazy { Empty as Stream<A> }) { a ->
         { lsa: Lazy<Stream<A>> ->
-            if (p(a)) cons(Lazy{ a }, lsa ) else lsa()
+            if (p(a)) cons(Lazy{ a }, lsa ) else lsa().dropWhile { !p(it) }
         }
     }
 
@@ -117,12 +117,10 @@ sealed class Stream<A> {
 
         fun <A> iterate(seed: A, f: (A) -> A): Stream<A> = cons(Lazy { seed }, Lazy { iterate(f(seed), f) })
 
-        fun <A, S> unfold(z: S, f: (S) -> Result<Pair<A, S>>): Stream<A> = (f(z)).let {
-            when (it) {
-                is Result.Success -> Cons(Lazy { it.value.first }, Lazy { unfold(it.value.second, f) })
-                else -> Empty as Stream<A>
-            }
-        }
+        fun <A, S> unfold(z: S, f: (S) -> Result<Pair<A, S>>): Stream<A> = f(z).map { pair ->
+            Cons(Lazy { pair.first }, Lazy { unfold(pair.second, f) }) as Stream<A>
+        }.getOrElse(Empty as Stream<A>)
+
     }
 }
 
