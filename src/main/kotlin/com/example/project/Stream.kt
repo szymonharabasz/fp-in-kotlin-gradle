@@ -106,16 +106,23 @@ sealed class Stream<A> {
 
         operator fun <A> invoke(): Stream<A> = Empty as Stream<A>
 
-        fun from(i: Int): Stream<Int> = iterate(i) { it + 1 }
+        fun from(i: Int): Stream<Int> = unfold(i) { Result(Pair(it, it + 1)) }
 
-        fun <A> repeat(f: () -> A): Stream<A> = cons(Lazy{ f() }, Lazy{ repeat(f) } )
+        fun <A> repeat(f: () -> A): Stream<A> = cons(Lazy { f() }, Lazy { repeat(f) })
 
         tailrec fun <A> toList(stream: Stream<A>, acc: LinkedList<A>): LinkedList<A> = when (stream) {
             Empty -> acc
             is Cons -> toList(stream.tl(), acc.cons(stream.hd()))
         }
 
-        fun <A> iterate(seed: A, f: (A) -> A): Stream<A> = cons(Lazy{ seed }, Lazy{ iterate(f(seed), f) })
+        fun <A> iterate(seed: A, f: (A) -> A): Stream<A> = cons(Lazy { seed }, Lazy { iterate(f(seed), f) })
+
+        fun <A, S> unfold(z: S, f: (S) -> Result<Pair<A, S>>): Stream<A> = (f(z)).let {
+            when (it) {
+                is Result.Success -> Cons(Lazy { it.value.first }, Lazy { unfold(it.value.second, f) })
+                else -> Empty as Stream<A>
+            }
+        }
     }
 }
 
