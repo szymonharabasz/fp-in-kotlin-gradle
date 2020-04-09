@@ -1014,7 +1014,7 @@ class ExercisesTests {
 */
     @Nested
     inner class Chapter9 {
-        /*
+
         @Test
         fun lazyReturnsCorrectValues() {
 
@@ -1028,6 +1028,7 @@ class ExercisesTests {
                 fooBar.hello(2)
                 throw IllegalStateException()
             }
+
             fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
 
             assertTrue(first() || second())
@@ -1038,7 +1039,7 @@ class ExercisesTests {
             verify(fooBar, times(0)).hello(2)
 
         }
-*/
+
         @Test
         fun sequenceResultIsEscaping() {
             val fooBar = mock(FooBar::class.java)
@@ -1060,6 +1061,65 @@ class ExercisesTests {
             verify(fooBar, times(0)).hello(6)
 
         }
+
+        @Test
+        fun forEachDoesNotEvaluateIfValueNotNeeded() {
+            val fooBar = mock(FooBar::class.java)
+
+            val emptyFunFooBar: (FooBar) -> Unit = { }
+            val emptyFunVoid: () -> Unit = { }
+
+            Lazy<FooBar> {
+                fooBar.hello(1);
+                fooBar
+            }
+                    .forEach(true, emptyFunVoid, emptyFunFooBar)
+            verify(fooBar, times(0)).hello(1)
+        }
+
+        @Test
+        fun takeAtMostWorksForHugeStream() {
+            assertDoesNotThrow { Stream.repeat { 4 }.takeAtMost(100000) }
+        }
+
+        @Test
+        fun takeAtMostWorksForHugeStreamEvenWhenConvertedToList() {
+            assertDoesNotThrow { Stream.repeat { 4 }.takeAtMost(100000).toList() }
+        }
+
+        @Test
+        fun dropAtMostWorksForHugeStream() {
+            assertDoesNotThrow { Stream.repeat { 4 }.dropAtMost(100000) }
+        }
+
+        @Test
+        fun streamIsConvertedToList() {
+            assertEquals(LinkedList(3, 4, 5, 6, 7, 8), Stream.from(3).takeAtMost(6).toList())
+        }
+
+        @Test
+        fun iterateReturnsCorrectStream() {
+            assertEquals(
+                    LinkedList(2, 4, 8, 16, 32, 64, 128),
+                    Stream.iterate(2) { 2 * it }.takeAtMost(7).toList())
+        }
+
+        @Test
+        fun takeWhileReturnsCorrectStream() {
+            assertEquals(
+                    LinkedList(2,4,8,16,32),
+                    Stream.iterate(2) { 2 * it }.takeWhile { it < 64 }.toList()
+            )
+        }
+
+        @Test
+        fun dropWhileReturnsCorrectStream() {
+            assertEquals(
+                    LinkedList(64,128,256,512,1024,2048),
+                    Stream.iterate(2) { 2 * it }.dropWhile { it < 64 }.takeAtMost(6).toList()
+            )
+        }
+
     }
 }
 
