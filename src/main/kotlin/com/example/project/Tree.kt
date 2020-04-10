@@ -62,6 +62,14 @@ sealed class Tree<A: Comparable<A>> {
         }
     }
 
+    fun <B> foldLeft(
+            identity: B,
+            f: (B) -> (A) -> B,
+            g: (B) -> (B) -> B): B = when (this) {
+        Empty -> identity
+        is T -> f ( g( left.foldLeft(identity,f,g) )( right.foldLeft(identity,f,g)) ) ( value )
+    }
+
     internal object Empty: Tree<Nothing>() {
 
         override fun isEmpty(): Boolean = true

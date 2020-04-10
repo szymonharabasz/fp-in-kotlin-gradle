@@ -1246,10 +1246,6 @@ class ExercisesTests {
             val tree2 = Tree<Int>(5,6,7,8,9)
             val merged = tree1.merge(tree2)
 
-            println(tree1)
-            println(tree2)
-            println(merged)
-
             assertTrue(merged.contains(1))
             assertTrue(merged.contains(2))
             assertTrue(merged.contains(3))
@@ -1259,6 +1255,25 @@ class ExercisesTests {
             assertTrue(merged.contains(7))
             assertTrue(merged.contains(8))
             assertTrue(merged.contains(9))
+        }
+
+        @Test
+        fun foldLeftReturnsSumOfTreeElements() {
+            val summation: (Int) -> (Int) -> Int = { a -> { b -> a + b } }
+            assertEquals(
+                    1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9,
+                    Tree<Int>(1, 3, 5, 9, 2, 6, 4, 8, 7).foldLeft(0, summation, summation)
+            )
+        }
+
+        @Test
+        fun foldLeftReturnsListWithTheLengthEqualTreeSize() {
+            val consList: (LinkedList<Int>) -> (Int) -> LinkedList<Int> = { list -> { a -> list.cons(a) } }
+            val concatList: (LinkedList<Int>) -> (LinkedList<Int>) -> LinkedList<Int> =
+                    { list1 -> { list2 -> list1.concat(list2) } }
+            val tree = Tree<Int>(1, 3, 5, 9, 2, 6, 4, 8, 7)
+            val list = tree.foldLeft<LinkedList<Int>>(LinkedList<Int>(), consList, concatList)
+            assertEquals(list.length, tree.size)
         }
     }
 }
