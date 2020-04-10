@@ -22,9 +22,9 @@ import java.io.PrintStream
 
 @DisplayName("ALl the tests")
 class ExercisesTests {
-    /*
+
     @Nested
-   // @Disabled
+    @Disabled
     inner class Chapter3 {
         @Nested
         @DisplayName("Exercise 3.1")
@@ -140,7 +140,7 @@ class ExercisesTests {
     }
 
     @Nested
-   // @Disabled
+    @Disabled
     inner class Chapter4 {
         @Nested
         @DisplayName("Exercise 4.1")
@@ -472,7 +472,7 @@ class ExercisesTests {
     }
 
     @Nested
-   // @Disabled
+    @Disabled
     inner class Chapter5 {
         @Test
         fun returnsCorrectStringRepresentationOfList() {
@@ -551,7 +551,7 @@ class ExercisesTests {
     }
 
     @Nested
-   // @Disabled
+    @Disabled
     inner class Chapter6 {
         @Test
         fun getOrElseOnNoneReturnsDefaultValue() {
@@ -635,7 +635,7 @@ class ExercisesTests {
     }
 
     @Nested
-   // @Disabled
+    @Disabled
     inner class Chapter7 {
         @Test
         fun filterReturnsTheOriginalResultIfConditionIsFulfilled() {
@@ -667,7 +667,7 @@ class ExercisesTests {
     }
 
     @Nested
-   // @Disabled
+    @Disabled
     inner class Chapter8 {
         @Test
         fun flattenListReturnsListOfValuesOfSuccess() {
@@ -1011,8 +1011,9 @@ class ExercisesTests {
             assertEquals(Result(LinkedList(2,5,8,11)), LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.get(2))
         }
     }
-*/
+
     @Nested
+    @Disabled
     inner class Chapter9 {
 
         @Test
@@ -1197,6 +1198,67 @@ class ExercisesTests {
         @Test
         fun filterIsStackSafeWithLongSeriesOfRejectedValues() {
             assertDoesNotThrow { Stream.from(1).filter { it % 2000 == 0 }.takeAtMost(10).toList() }
+        }
+    }
+
+    @Nested
+    inner class Chapter10 {
+
+        @Test
+        fun treeIsNotEmptyAfterAddingElement() {
+            assertFalse((Tree<Int>() + 1).isEmpty())
+        }
+
+        @Test
+        fun treeContainsAddedElementsInCorrectOrder() {
+            assertEquals("(() 1 ((() 3 ((() 4 ()) 5 ())) 6 ()))", "${Tree<Int>() + 1 + 6 + 3 + 5 + 4 + 6}")
+        }
+
+        @Test
+        fun treContainsElementWithWhichWasConstructed() {
+            assertTrue(Tree<Int>(1,2,3,4,5,6,7,8).contains(4))
+        }
+
+        @Test
+        fun treeDoesNotContainElementWithWhichWasNotConstructed() {
+            assertFalse(Tree<Int>(1,2,3,5,6,7,8).contains(4))
+        }
+
+        @Test
+        fun treeContainsElementWhichWasAddedAfterContruction() {
+            assertTrue(Tree<Int>(1,2,3,5,6,7).plus(4).contains(4))
+        }
+
+        @Test
+        fun treeDoesNotContainRemovedElement() {
+            assertFalse(Tree<Int>(1,2,3,4,5,6,7,9).remove(6).contains(6))
+        }
+
+        @Test
+        fun sizeIsSmallerBy1afterRemovingElement() {
+            val tree = Tree<Int>(1,2,3,4,5,6,7,9)
+            assertEquals(tree.size - 1 , tree.remove(4).size)
+        }
+
+        @Test
+        fun mergeTreeContainsElementsOfReceiverAndParameter() {
+            val tree1 = Tree<Int>(1,2,3,4)
+            val tree2 = Tree<Int>(5,6,7,8,9)
+            val merged = tree1.merge(tree2)
+
+            println(tree1)
+            println(tree2)
+            println(merged)
+
+            assertTrue(merged.contains(1))
+            assertTrue(merged.contains(2))
+            assertTrue(merged.contains(3))
+            assertTrue(merged.contains(4))
+            assertTrue(merged.contains(5))
+            assertTrue(merged.contains(6))
+            assertTrue(merged.contains(7))
+            assertTrue(merged.contains(8))
+            assertTrue(merged.contains(9))
         }
     }
 }
