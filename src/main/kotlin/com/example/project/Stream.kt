@@ -48,11 +48,15 @@ sealed class Stream<A> {
         { lsb -> f(a).append(lsb) }
     }
 
-    fun filter(p: (A) -> Boolean): Stream<A> = dropWhile { !p(it) }.foldRight(Lazy { Empty as Stream<A> }) { a ->
-        { lsa: Lazy<Stream<A>> ->
-            if (p(a)) cons(Lazy{ a }, lsa ) else lsa().dropWhile { !p(it) }
-        }
+    fun filter(p: (A) -> Boolean): Stream<A> {
+    return if (this is Empty) this
+    else {
+        val starting = dropWhile { !p(it) }.takeWhile(p)
+        val toContinue = dropWhile { !p(it) }.dropWhile(p)
+        starting.append(Lazy { toContinue.filter(p) })
     }
+}
+
 
     fun find(p: (A) -> Boolean): Result<A> = filter(p).head()
 

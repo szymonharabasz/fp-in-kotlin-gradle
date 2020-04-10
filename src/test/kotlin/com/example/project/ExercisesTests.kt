@@ -1195,9 +1195,8 @@ class ExercisesTests {
         }
 
         @Test
-        @Disabled
         fun filterIsStackSafeWithLongSeriesOfRejectedValues() {
-            assertDoesNotThrow { Stream.from(1).filter { it % 2000 == 0 }.takeAtMost(1).toList() }
+            assertDoesNotThrow { Stream.from(1).filter { it % 2000 == 0 }.takeAtMost(10).toList() }
         }
     }
 }
