@@ -20,6 +20,7 @@ sealed class Result<A>: Serializable {
         override fun hashCode(): Int = exception::class.hashCode() + 41 * exception.message.hashCode()
 
         override fun isEmpty(): Boolean = false
+
     }
 
     internal data class Success<A>(internal val value: A): Result<A>() {
@@ -31,6 +32,9 @@ sealed class Result<A>: Serializable {
         override fun toString(): String = "Empty"
         override fun isEmpty(): Boolean = true
     }
+
+    fun mapEmpty(): Result<Boolean> =
+            if (this is Empty) Result(true) else Companion.failure<Boolean>("not empty map")
 
     abstract fun isEmpty(): Boolean
 

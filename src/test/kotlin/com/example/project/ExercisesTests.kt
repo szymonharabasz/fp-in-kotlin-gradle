@@ -476,77 +476,94 @@ class ExercisesTests {
     inner class Chapter5 {
         @Test
         fun returnsCorrectStringRepresentationOfList() {
-            assertEquals("[2, 3, 4, 5, NIL]", "${LinkedList(2,3,4,5)}")
+            assertEquals("[2, 3, 4, 5, NIL]", "${LinkedList(2, 3, 4, 5)}")
         }
+
         @Test
         fun droppingZeroElementsReturnsTheSameList() {
-            assertEquals(LinkedList(2,3,4,5).drop(0), LinkedList(2,3,4,5))
+            assertEquals(LinkedList(2, 3, 4, 5).drop(0), LinkedList(2, 3, 4, 5))
         }
+
         @Test
         fun droppingSomeElementsReturnsTruncatedList() {
-            assertEquals(LinkedList(2,3,4,5).drop(2), LinkedList(4,5))
+            assertEquals(LinkedList(2, 3, 4, 5).drop(2), LinkedList(4, 5))
         }
+
         @Test
         fun droppingMoreElementsThanListHasReturnsEmptyList() {
-            assertEquals(LinkedList(2,3,4,5).drop(5), LinkedList<Int>())
+            assertEquals(LinkedList(2, 3, 4, 5).drop(5), LinkedList<Int>())
         }
+
         @Test
         fun droppingWhileConditionIsMet() {
-            assertEquals(LinkedList(2,3,4,5).dropWhile {it < 5}, LinkedList(5))
+            assertEquals(LinkedList(2, 3, 4, 5).dropWhile { it < 5 }, LinkedList(5))
         }
+
         @Test
         fun initOfListIsListWithoutLastElement() {
-            assertEquals("${LinkedList(2,3,4,5).init()}", "${LinkedList(2,3,4)}")
+            assertEquals("${LinkedList(2, 3, 4, 5).init()}", "${LinkedList(2, 3, 4)}")
         }
+
         @Test
         fun returnsSumOfListElements() {
-            assertEquals(2+3+4+5, LinkedList(2,3,4,5).sum())
+            assertEquals(2 + 3 + 4 + 5, LinkedList(2, 3, 4, 5).sum())
         }
+
         @Test
         fun returnsSumOfListElementsWithFoldRight() {
-            assertEquals(2+3+4+5, LinkedList(2,3,4,5).sumFoldRight())
+            assertEquals(2 + 3 + 4 + 5, LinkedList(2, 3, 4, 5).sumFoldRight())
         }
+
         @Test
         fun returnsSumOfListElementsWithCoFoldRight() {
-            assertEquals(2+3+4+5, LinkedList(2,3,4,5).sumCoFoldRight())
+            assertEquals(2 + 3 + 4 + 5, LinkedList(2, 3, 4, 5).sumCoFoldRight())
         }
+
         @Test
         fun returnsProductOfListElements() {
-            assertEquals(2*3*4*5, LinkedList(2,3,4,5).product())
+            assertEquals(2 * 3 * 4 * 5, LinkedList(2, 3, 4, 5).product())
         }
+
         @Test
         fun returnsListLength() {
-            assertEquals(4, LinkedList(2,3,4,5).length())
+            assertEquals(4, LinkedList(2, 3, 4, 5).length())
         }
+
         @Test
         fun lengthIsStackSafe() {
             assertDoesNotThrow { LinkedList(0 to 100000).length() }
         }
+
         @Test
         fun concatReturnsConcatenatedList() {
-            assertEquals(LinkedList(1,2,3,4,5,6,7), LinkedList(1,2,3,4).concat(LinkedList(5,6,7)))
+            assertEquals(LinkedList(1, 2, 3, 4, 5, 6, 7), LinkedList(1, 2, 3, 4).concat(LinkedList(5, 6, 7)))
         }
+
         @Test
         fun flattenedListIsConcatenationOfSublists() {
-            assertEquals(LinkedList(1,2,3,4,5,6,7,8,9),
-                    LinkedList.flatten(LinkedList(LinkedList(1,2,3), LinkedList(4,5,6), LinkedList(7,8,9))))
+            assertEquals(LinkedList(1, 2, 3, 4, 5, 6, 7, 8, 9),
+                    LinkedList.flatten(LinkedList(LinkedList(1, 2, 3), LinkedList(4, 5, 6), LinkedList(7, 8, 9))))
         }
+
         @Test
         fun time3returnsListOfElementsMultipliedBy3() {
-            assertEquals(LinkedList(3,6,9,12), LinkedList(1,2,3,4).times3())
+            assertEquals(LinkedList(3, 6, 9, 12), LinkedList(1, 2, 3, 4).times3())
         }
+
         @Test
         fun doubleToStringReturnsListOfStringRepresentations() {
             assertEquals(LinkedList("1.0", "2.0", "3.0", "4.2"),
                     LinkedList(1.0, 2.0, 3.0, 4.2).doubleToString())
         }
+
         @Test
         fun filtersOutEvenElements() {
-            assertEquals(LinkedList(1,3,5,7,9), LinkedList(1,2,3,4,5,6,7,9,10).filter { it % 2 != 0 })
+            assertEquals(LinkedList(1, 3, 5, 7, 9), LinkedList(1, 2, 3, 4, 5, 6, 7, 9, 10).filter { it % 2 != 0 })
         }
+
         @Test
         fun flatMapReturnsCorrectFlatList() {
-            assertEquals(LinkedList(1,2,3,4,5,6,7,8), LinkedList(1,3,5,7).flatMap { LinkedList(it, it + 1)})
+            assertEquals(LinkedList(1, 2, 3, 4, 5, 6, 7, 8), LinkedList(1, 3, 5, 7).flatMap { LinkedList(it, it + 1) })
         }
     }
 
@@ -558,69 +575,84 @@ class ExercisesTests {
             val default = 5
             assertEquals(default, (Option<Int>().getOrElse(default)))
         }
+
         @Test
         fun getOrElseOnSomeReturnsContainedValue() {
             val default = 5
             val stored = 4
             assertEquals(stored, (Option<Int>(stored).getOrElse(default)))
         }
+
         @Test
         fun mapReturnsNoneForNone() {
             assertEquals(Option<Int>(), Option<Int>().map { 2 * it })
         }
+
         @Test
         fun mapReturnsMappedSomeForSome() {
             assertEquals(Option<Int>(6), Option<Int>(3).map { 2 * it })
         }
+
         @Test
         fun returnsNoneWhenPredicateNotFulfilled() {
             assertEquals(Option<Int>(), Option(5).filter { it % 2 == 0 })
         }
+
         @Test
         fun returnsTheSameWhenPredicateIsFulfilled() {
             assertEquals(Option(4), Option(4).filter { it % 2 == 0 })
         }
+
         @Test
         fun returnsMeanOfListOfNumbers() {
-            assertEquals(Option(3.5), mean(LinkedList(2.0,3.0,4.0,5.0)))
+            assertEquals(Option(3.5), mean(LinkedList(2.0, 3.0, 4.0, 5.0)))
         }
+
         @Test
         fun returnsVarianceOfListOfNumbers() {
-            assertEquals(Option(1.25), variance(LinkedList(2.0,3.0,4.0,5.0)))
+            assertEquals(Option(1.25), variance(LinkedList(2.0, 3.0, 4.0, 5.0)))
         }
+
         @Test
         fun liftedFunctionReturnsSomeOfFunctionValue() {
             val myF: (Int) -> Int = { 3 * it }
             assertEquals(Option(myF(4)), lift(myF)(Option(4)))
         }
+
         @Test
         fun liftedFunctionReturnsNoneForArgumentNone() {
             val myF: (Int) -> Int = { 3 * it }
             assertEquals(Option<Int>(), lift(myF)(Option<Int>()))
         }
+
         @Test
         fun liftedFunctionReturnsNoneIfExceptionIsThrown() {
             val myF: (Int) -> Int = { throw IllegalThreadStateException(); 3 * it }
             assertEquals(Option<Int>(), lift(myF)(Option<Int>(4)))
         }
+
         @Test
         fun map3returnsSomeOfFunctionAppliedToArguments() {
-            val f: (Int) -> (Int) -> (Int) -> Int = { x -> { y -> { z -> (2*x + y)*z}}}
+            val f: (Int) -> (Int) -> (Int) -> Int = { x -> { y -> { z -> (2 * x + y) * z } } }
             assertEquals(Option(f(1)(2)(3)), map3(Option(1), Option(2), Option(3), f))
         }
+
         @Test
         fun map3returnsNoneIfOneOfArgumentsIsNone() {
-            val f: (Int) -> (Int) -> (Int) -> Int = { x -> { y -> { z -> (2*x + y)*z}}}
+            val f: (Int) -> (Int) -> (Int) -> Int = { x -> { y -> { z -> (2 * x + y) * z } } }
             assertEquals(Option<Int>(), map3(Option(1), Option(), Option(3), f))
         }
+
         @Test
         fun sequenceReturnsSomeOfListIfAllElementsAreSome() {
-            assertEquals(Option(LinkedList(1,2,3)), option_sequence(LinkedList(Option(1), Option(2), Option(3))))
+            assertEquals(Option(LinkedList(1, 2, 3)), option_sequence(LinkedList(Option(1), Option(2), Option(3))))
         }
+
         @Test
         fun sequenceReturnsNoneIfOneOfElementsIsNone() {
             assertEquals(Option<LinkedList<Int>>(), option_sequence(LinkedList(Option(1), Option<Int>(), Option(3))))
         }
+
         @Test
         fun traverseReturnsListOfMappedValues() {
             val parseWithRadix: (Int) -> (String) -> Int = { radix ->
@@ -629,8 +661,8 @@ class ExercisesTests {
                 }
             }
             val parse16 = hLift(parseWithRadix(16))
-            assertEquals(Option(LinkedList(4,5,6,7,8,9,10,11)),
-                    traverse(LinkedList("4","5","6","7","8","9","A","B"), parse16))
+            assertEquals(Option(LinkedList(4, 5, 6, 7, 8, 9, 10, 11)),
+                    traverse(LinkedList("4", "5", "6", "7", "8", "9", "A", "B"), parse16))
         }
     }
 
@@ -641,23 +673,27 @@ class ExercisesTests {
         fun filterReturnsTheOriginalResultIfConditionIsFulfilled() {
             assertEquals(
                     com.example.project.result.Result(4),
-                    com.example.project.result.Result(4).filter( {it % 2 == 0} ))
+                    com.example.project.result.Result(4).filter({ it % 2 == 0 }))
         }
+
         @Test
         fun filterReturnsFailureWithCorrectStringIfConditionNotFulfilled() {
             val message = "condition not met"
             assertEquals(
                     com.example.project.result.Result.failure<Int>(message),
-                    com.example.project.result.Result(5).filter( {it % 2 == 0}, message ))
+                    com.example.project.result.Result(5).filter({ it % 2 == 0 }, message))
         }
+
         @Test
         fun existsReturnsTrueIfConditionIsFulfilled() {
-            assertEquals(true, com.example.project.result.Result(4).exists {it % 2 == 0})
+            assertEquals(true, com.example.project.result.Result(4).exists { it % 2 == 0 })
         }
+
         @Test
         fun existsReturnsFalseIfConditionNotFulfilled() {
-            assertEquals(false, com.example.project.result.Result(5).exists {it % 2 == 0})
+            assertEquals(false, com.example.project.result.Result(5).exists { it % 2 == 0 })
         }
+
         @Test
         fun failuresWithDifferentExceptionTypesAreNotEqual() {
             assertNotEquals(
@@ -671,7 +707,7 @@ class ExercisesTests {
     inner class Chapter8 {
         @Test
         fun flattenListReturnsListOfValuesOfSuccess() {
-            assertEquals(LinkedList(2,4,6,8),
+            assertEquals(LinkedList(2, 4, 6, 8),
                     flattenResult(
                             LinkedList(
                                     Result(2),
@@ -686,7 +722,7 @@ class ExercisesTests {
         @Test
         fun sequenceReturnsSuccessForListOfSuccesses() {
             val input = LinkedList(Result(2), Result(3), Result(4), Result(5))
-            val expected = Result(LinkedList(2,3,4,5))
+            val expected = Result(LinkedList(2, 3, 4, 5))
             assertEquals(expected, sequence(input))
         }
 
@@ -725,18 +761,18 @@ class ExercisesTests {
 
         @Test
         fun lengthOfZippedListIsLengthOfShorterInput() {
-            val list1 = LinkedList(2,3,4,5)
-            val list2 = LinkedList(3,4,5,6,7,8)
+            val list1 = LinkedList(2, 3, 4, 5)
+            val list2 = LinkedList(3, 4, 5, 6, 7, 8)
             assertEquals(Math.min(list1.length(), list2.length()),
-                    zipWith(list1, list2) { _ -> { b: Int -> b }}.length())
+                    zipWith(list1, list2) { _ -> { b: Int -> b } }.length())
         }
 
         @Test
         fun zipWithSumFunctionReturnsListOfSums() {
-            val list1 = LinkedList(2,3,4,5)
-            val list2 = LinkedList(3,4,5,6)
-            val expected = LinkedList(5,7,9,11)
-            assertEquals(expected, zipWith(list1, list2) { a -> { b: Int -> a + b}})
+            val list1 = LinkedList(2, 3, 4, 5)
+            val list2 = LinkedList(3, 4, 5, 6)
+            val expected = LinkedList(5, 7, 9, 11)
+            assertEquals(expected, zipWith(list1, list2) { a -> { b: Int -> a + b } })
 
         }
 
@@ -745,14 +781,14 @@ class ExercisesTests {
             val list1 = LinkedList("a", "b", "c")
             val list2 = LinkedList("d", "e", "f")
             val expected = LinkedList("ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf")
-            assertEquals(expected, product(list1, list2) { a -> { b: String -> a + b}})
+            assertEquals(expected, product(list1, list2) { a -> { b: String -> a + b } })
         }
 
         @Test
         fun unzipReturnsPairOfLists() {
             assertEquals(
-                    Pair(LinkedList(2,3,4,5), LinkedList(5,6,7,8)),
-                    unzip(LinkedList(Pair(2,5), Pair(3,6), Pair(4, 7), Pair(5, 8)))
+                    Pair(LinkedList(2, 3, 4, 5), LinkedList(5, 6, 7, 8)),
+                    unzip(LinkedList(Pair(2, 5), Pair(3, 6), Pair(4, 7), Pair(5, 8)))
             )
         }
 
@@ -800,93 +836,95 @@ class ExercisesTests {
         fun foldLeftWithZeroReturnsIdentityForEmptyList() {
             val zero = 0
             val identity = 1
-            assertEquals(identity, LinkedList<Int>().foldLeft(identity, zero, { b, a -> a * b}).first)
+            assertEquals(identity, LinkedList<Int>().foldLeft(identity, zero, { b, a -> a * b }).first)
         }
 
         @Test
         fun foldLeftWithZeroReturnsZeroElementForListContainingItOnly() {
             val zero = 0
             val identity = 1
-            assertEquals(zero, LinkedList<Int>(zero).foldLeft(identity, zero, { b, a -> a * b}).first)
+            assertEquals(zero, LinkedList<Int>(zero).foldLeft(identity, zero, { b, a -> a * b }).first)
         }
 
         @Test
         fun foldLeftWithZeroReturnsFoldedValueForListContainingZeroElement() {
             val zero = 0
             val identity = 1
-            val foldedValue = 6*0*9
-            assertEquals(foldedValue, LinkedList<Int>(6,0,8).foldLeft(identity, zero, { b, a -> a * b}).first)
+            val foldedValue = 6 * 0 * 9
+            assertEquals(foldedValue, LinkedList<Int>(6, 0, 8).foldLeft(identity, zero, { b, a -> a * b }).first)
         }
 
         @Test
         fun foldLeftWithZeroReturnsFoldedValueForListNotContainingZeroElement() {
             val zero = 0
             val identity = 1
-            val foldedValue = 6*7*8
-            assertEquals(foldedValue, LinkedList<Int>(6,7,8).foldLeft(identity, zero, { b, a -> a * b}).first)
+            val foldedValue = 6 * 7 * 8
+            assertEquals(foldedValue, LinkedList<Int>(6, 7, 8).foldLeft(identity, zero, { b, a -> a * b }).first)
         }
 
         @Test
         fun foldLeftWithZeroIsShortCircuiting() {
             val zero = 0
             val identity = 1
-            assertDoesNotThrow { LinkedList<Int>(6,7,0,8).foldLeft(identity, zero, { b, a ->
-                if (a > 7) throw IllegalStateException()
-                a * b
-            }) }
+            assertDoesNotThrow {
+                LinkedList<Int>(6, 7, 0, 8).foldLeft(identity, zero, { b, a ->
+                    if (a > 7) throw IllegalStateException()
+                    a * b
+                })
+            }
         }
 
         @Test
         fun splitAtIndexInsideTheListSplitsIt() {
-            assertEquals(Pair(LinkedList(2,3,4), LinkedList(5,6,7,8)), LinkedList(2,3,4,5,6,7,8).splitAt(3))
+            assertEquals(Pair(LinkedList(2, 3, 4), LinkedList(5, 6, 7, 8)), LinkedList(2, 3, 4, 5, 6, 7, 8).splitAt(3))
         }
 
         @Test
         fun splitAtZeroReturnsOriginalListAndEmptyOne() {
-            val list = LinkedList(2,3,4,5,6,7,8)
+            val list = LinkedList(2, 3, 4, 5, 6, 7, 8)
             assertEquals(Pair(LinkedList<Int>(), list), list.splitAt(0))
         }
 
         @Test
         fun splitAtNegativeIndexReturnsOriginalListAndEmptyOne() {
-            val list = LinkedList(2,3,4,5,6,7,8)
+            val list = LinkedList(2, 3, 4, 5, 6, 7, 8)
             assertEquals(Pair(LinkedList<Int>(), list), list.splitAt(0))
         }
 
         @Test
         fun splitIndexAfterLastReturnsEmptyAndOriginalOne() {
-            val list = LinkedList(2,3,4,5,6,7,8)
+            val list = LinkedList(2, 3, 4, 5, 6, 7, 8)
             assertEquals(Pair(list, LinkedList<Int>()), list.splitAt(10))
         }
 
         @Test
         fun startsWithReturnsTrueIfReceiverStartsWithArgument() {
-            assertTrue(LinkedList(2,3,4,5,6,7).startsWith(LinkedList(2,3,4)))
+            assertTrue(LinkedList(2, 3, 4, 5, 6, 7).startsWith(LinkedList(2, 3, 4)))
         }
 
         @Test
         fun startsWithReturnsFalseIfThereIsDifferentElement() {
-            assertFalse(LinkedList(3,4,5,6).startsWith(LinkedList(3,4,6,5)))
+            assertFalse(LinkedList(3, 4, 5, 6).startsWith(LinkedList(3, 4, 6, 5)))
         }
 
         @Test
         fun startsWithReturnsFailsIfReceiverIsSublistOfArgument() {
-            assertFalse(LinkedList(2,3,4).startsWith(LinkedList(2,3,4,5,6)))
+            assertFalse(LinkedList(2, 3, 4).startsWith(LinkedList(2, 3, 4, 5, 6)))
         }
 
         @Test
         fun hasSublistReturnsTrueIfArgumentIsSublistOfReceiver() {
-            assertTrue(LinkedList(2,3,4,5,6,7).hasSublist(LinkedList(4,5,6)))
+            assertTrue(LinkedList(2, 3, 4, 5, 6, 7).hasSublist(LinkedList(4, 5, 6)))
         }
 
         @Test
         fun hasSublistReturnsFalseIfThereIsNotMatchingElement() {
-            assertFalse(LinkedList(2,3,4,5,6,7).hasSublist(LinkedList(3,4,6,5)))
+            assertFalse(LinkedList(2, 3, 4, 5, 6, 7).hasSublist(LinkedList(3, 4, 6, 5)))
         }
 
         @Test
         fun unfoldGeneratesList() {
-            assertEquals(LinkedList(0,1,2,3,4,5,6,7,8,9), unfold(0) { i ->
+            assertEquals(LinkedList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), unfold(0) { i ->
                 if (i < 10)
                     Option(Pair(i, i + 1))
                 else
@@ -897,32 +935,32 @@ class ExercisesTests {
 
         @Test
         fun rangeGeneratesListOfNumbers() {
-            assertEquals(LinkedList(2,3,4,5,6), myRange(2,7))
+            assertEquals(LinkedList(2, 3, 4, 5, 6), myRange(2, 7))
         }
 
         @Test
         fun existsDetectsElementPresent() {
-            assertTrue(LinkedList(2,3,4,5,6).exists { it == 4 })
+            assertTrue(LinkedList(2, 3, 4, 5, 6).exists { it == 4 })
         }
 
         @Test
         fun existsDetectsElementAbsent() {
-            assertFalse(LinkedList(2,3,4,5,6).exists { it == 42 })
+            assertFalse(LinkedList(2, 3, 4, 5, 6).exists { it == 42 })
         }
 
         @Test
         fun forAllDetectsThatAllElemetsAreEven() {
-            assertTrue(LinkedList(2,4,6,8,10).forAll { it % 2 == 0 })
+            assertTrue(LinkedList(2, 4, 6, 8, 10).forAll { it % 2 == 0 })
         }
 
         @Test
         fun forAllDetectsThatThereIsOddElement() {
-            assertFalse(LinkedList(2,4,6,7,10).forAll { it % 2 == 0 })
+            assertFalse(LinkedList(2, 4, 6, 7, 10).forAll { it % 2 == 0 })
         }
 
         @Test
         fun divideAtDepth1returnsListOfTwoLists() {
-            assertEquals(2, LinkedList(2,3,4,5,6,7,8,9).divide(1).length)
+            assertEquals(2, LinkedList(2, 3, 4, 5, 6, 7, 8, 9).divide(1).length)
         }
 
         @Test
@@ -941,7 +979,7 @@ class ExercisesTests {
 
         @Test
         fun divideAtDepth2returnsListOfFourLists() {
-            assertEquals(4, LinkedList(2,3,4,5,6,7,8,9).divide(2).length)
+            assertEquals(4, LinkedList(2, 3, 4, 5, 6, 7, 8, 9).divide(2).length)
         }
 
         @Test
@@ -962,7 +1000,7 @@ class ExercisesTests {
         fun divideAtDepth1ofTwoElementListReturnsTwoOneElementLists() {
             assertEquals(
                     LinkedList(LinkedList(2), LinkedList(3)),
-                    LinkedList(2,3).divide(1))
+                    LinkedList(2, 3).divide(1))
         }
 
         @Test
@@ -976,7 +1014,7 @@ class ExercisesTests {
         fun divideAtTooLargeDepthResutnsListOfOneElementLists() {
             assertEquals(
                     LinkedList(LinkedList(2), LinkedList(3), LinkedList(4), LinkedList(5), LinkedList(6)),
-                    LinkedList(2,3,4,5,6).divide(4))
+                    LinkedList(2, 3, 4, 5, 6).divide(4))
         }
 
         @Test
@@ -986,29 +1024,29 @@ class ExercisesTests {
 
         @Test
         fun newValueForKeyAfterReset() {
-            assertEquals(Result(5), MyLinkedMap<Int, Int>().set(2, 3).set(3, 4).set(2 ,5).get(2))
+            assertEquals(Result(5), MyLinkedMap<Int, Int>().set(2, 3).set(3, 4).set(2, 5).get(2))
         }
 
         @Test
         fun lengthOfKeysListIsCorrect() {
-            assertEquals(3, LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.keys().length)
+            assertEquals(3, LinkedList(2, 3, 4, 5, 6, 7, 8, 9, 10, 11).groupBy { it % 3 }.keys().length)
         }
 
         @Test
         fun lengthOfValuesListIsCorrect() {
-            assertEquals(3, LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.values().length)
+            assertEquals(3, LinkedList(2, 3, 4, 5, 6, 7, 8, 9, 10, 11).groupBy { it % 3 }.values().length)
         }
 
         @Test
         fun groupByReturnsMapWithAllKeys() {
-            assertTrue(LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.keys().exists { it == 0 })
-            assertTrue(LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.keys().exists { it == 1 })
-            assertTrue(LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.keys().exists { it == 2 })
+            assertTrue(LinkedList(2, 3, 4, 5, 6, 7, 8, 9, 10, 11).groupBy { it % 3 }.keys().exists { it == 0 })
+            assertTrue(LinkedList(2, 3, 4, 5, 6, 7, 8, 9, 10, 11).groupBy { it % 3 }.keys().exists { it == 1 })
+            assertTrue(LinkedList(2, 3, 4, 5, 6, 7, 8, 9, 10, 11).groupBy { it % 3 }.keys().exists { it == 2 })
         }
 
         @Test
         fun groupByReturnsCorrectValueFOrGivenKey() {
-            assertEquals(Result(LinkedList(2,5,8,11)), LinkedList(2,3,4,5,6,7,8,9,10,11).groupBy { it % 3 }.get(2))
+            assertEquals(Result(LinkedList(2, 5, 8, 11)), LinkedList(2, 3, 4, 5, 6, 7, 8, 9, 10, 11).groupBy { it % 3 }.get(2))
         }
     }
 
@@ -1108,7 +1146,7 @@ class ExercisesTests {
         @Test
         fun takeWhileReturnsCorrectStream() {
             assertEquals(
-                    LinkedList(2,4,8,16,32),
+                    LinkedList(2, 4, 8, 16, 32),
                     Stream.iterate(2) { 2 * it }.takeWhile { it < 64 }.toList()
             )
         }
@@ -1116,7 +1154,7 @@ class ExercisesTests {
         @Test
         fun dropWhileReturnsCorrectStream() {
             assertEquals(
-                    LinkedList(64,128,256,512,1024,2048),
+                    LinkedList(64, 128, 256, 512, 1024, 2048),
                     Stream.iterate(2) { 2 * it }.dropWhile { it < 64 }.takeAtMost(6).toList()
             )
         }
@@ -1124,7 +1162,7 @@ class ExercisesTests {
         @Test
         fun foldRightWorksForIntegers() {
             assertEquals(
-                    2+4+8+16+32,
+                    2 + 4 + 8 + 16 + 32,
                     Stream.iterate(2) { 2 * it }.takeAtMost(5).foldRight(Lazy { 0 }) { el ->
                         { acc ->
                             {
@@ -1149,7 +1187,7 @@ class ExercisesTests {
         @Test
         fun mapReturnsMappedStream() {
             assertEquals(
-                    LinkedList(2*2, 4*4, 8*8, 16*16, 32*32, 64*64),
+                    LinkedList(2 * 2, 4 * 4, 8 * 8, 16 * 16, 32 * 32, 64 * 64),
                     Stream.iterate(2) { 2 * it }.map { it * it }.takeAtMost(6).toList()
             )
         }
@@ -1157,8 +1195,8 @@ class ExercisesTests {
         @Test
         fun filterReturnsStreamWithElementsFulfillingCondition() {
             assertEquals(
-                    LinkedList(2,8,16,32,128,256,512,2048),
-                    Stream.iterate(2) { 2 * it }.filter { it % 10 != 4}.takeAtMost(8).toList()
+                    LinkedList(2, 8, 16, 32, 128, 256, 512, 2048),
+                    Stream.iterate(2) { 2 * it }.filter { it % 10 != 4 }.takeAtMost(8).toList()
             )
         }
 
@@ -1176,7 +1214,7 @@ class ExercisesTests {
         @Test
         fun flatMapReturnsMergedStream() {
             assertEquals(
-                    LinkedList(2,3,4,5,6,7,8,9,10,11),
+                    LinkedList(2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
                     Stream.iterate(2) { it + 2 }.flatMap { Stream.from(it).takeAtMost(2) }
                             .takeAtMost(10).toList()
             )
@@ -1211,39 +1249,39 @@ class ExercisesTests {
 
         @Test
         fun treeContainsAddedElementsInCorrectOrder() {
-            assertEquals("(() 1 ((() 3 ((() 4 ()) 5 ())) 6 ()))", "${Tree<Int>() + 1 + 6 + 3 + 5 + 4 + 6}")
+            assertEquals("(E 1 ((E 3 ((E 4 E) 5 E)) 6 E))", "${Tree<Int>() + 1 + 6 + 3 + 5 + 4 + 6}")
         }
 
         @Test
-        fun treContainsElementWithWhichWasConstructed() {
-            assertTrue(Tree<Int>(1,2,3,4,5,6,7,8).contains(4))
+        fun treeContainsElementWithWhichWasConstructed() {
+            assertTrue(Tree<Int>(1, 2, 3, 4, 5, 6, 7, 8).contains(4))
         }
 
         @Test
         fun treeDoesNotContainElementWithWhichWasNotConstructed() {
-            assertFalse(Tree<Int>(1,2,3,5,6,7,8).contains(4))
+            assertFalse(Tree<Int>(1, 2, 3, 5, 6, 7, 8).contains(4))
         }
 
         @Test
         fun treeContainsElementWhichWasAddedAfterContruction() {
-            assertTrue(Tree<Int>(1,2,3,5,6,7).plus(4).contains(4))
+            assertTrue(Tree<Int>(1, 2, 3, 5, 6, 7).plus(4).contains(4))
         }
 
         @Test
         fun treeDoesNotContainRemovedElement() {
-            assertFalse(Tree<Int>(1,2,3,4,5,6,7,9).remove(6).contains(6))
+            assertFalse(Tree<Int>(1, 2, 3, 4, 5, 6, 7, 9).remove(6).contains(6))
         }
 
         @Test
         fun sizeIsSmallerBy1afterRemovingElement() {
-            val tree = Tree<Int>(1,2,3,4,5,6,7,9)
-            assertEquals(tree.size - 1 , tree.remove(4).size)
+            val tree = Tree<Int>(1, 2, 3, 4, 5, 6, 7, 9)
+            assertEquals(tree.size - 1, tree.remove(4).size)
         }
 
         @Test
         fun mergeTreeContainsElementsOfReceiverAndParameter() {
-            val tree1 = Tree<Int>(1,2,3,4)
-            val tree2 = Tree<Int>(5,6,7,8,9)
+            val tree1 = Tree<Int>(1, 2, 3, 4)
+            val tree2 = Tree<Int>(5, 6, 7, 8, 9)
             val merged = tree1.merge(tree2)
 
             assertTrue(merged.contains(1))
@@ -1275,8 +1313,140 @@ class ExercisesTests {
             val list = tree.foldLeft<LinkedList<Int>>(LinkedList<Int>(), consList, concatList)
             assertEquals(list.length, tree.size)
         }
+
+        @Test
+        fun foldInOrderReturnsCorrectListForTree() {
+            val tree = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(3)),
+                    4,
+                    Tree.T(Tree<Int>(5), 6, Tree<Int>(7)))
+            val list = LinkedList(1, 2, 3, 4, 5, 6, 7)
+            assertEquals(
+                    list,
+                    tree.toListInOrderRight()
+            )
+        }
+
+        @Test
+        fun foldPreOrderReturnsCorrectListForTree() {
+            val tree = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(3)),
+                    4,
+                    Tree.T(Tree<Int>(5), 6, Tree<Int>(7)))
+            val list = LinkedList(4, 2, 1, 3, 6, 5, 7)
+            assertEquals(
+                    list,
+                    tree.foldPreOrder(LinkedList<Int>()) { a ->
+                        { list1 ->
+                            { list2 ->
+                                list1.cons(a).concat(list2)
+                            }
+                        }
+                    }
+            )
+        }
+
+        @Test
+        fun foldPostOrderReturnsCorrectListForTree() {
+            val tree = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(3)),
+                    4,
+                    Tree.T(Tree<Int>(5), 6, Tree<Int>(7)))
+            val list = LinkedList(1, 3, 2, 5, 7, 6, 4)
+            assertEquals(
+                    list,
+                    tree.foldPostOrder(LinkedList<Int>()) { list1 ->
+                        { list2 ->
+                            { a ->
+                                list2.cons(a).concat(list1)
+                            }
+                        }
+                    }.reverse()
+            )
+        }
+
+        @Test
+        fun foldInOrderWithInvokeOperatorReturnsTheSameTree() {
+            val tree = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(3)),
+                    4,
+                    Tree.T(Tree<Int>(5), 6, Tree<Int>(7)))
+
+            assertEquals(
+                    tree,
+                    tree.foldInOrder(Tree<Int>()) { t1 ->
+                        { i -> { t2 -> Tree(t1, i, t2) } }
+                    }
+            )
+
+        }
+
+        @Test
+        fun foldInOrderWithInvokeOperatorReturnsOrderedTree() {
+            val tree = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(7)),
+                    6,
+                    Tree.T(Tree<Int>(3), 4, Tree<Int>(5)))
+            val expected = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(3)),
+                    4,
+                    Tree.T(Tree<Int>(5), 6, Tree<Int>(7)))
+
+            assertEquals(
+                    expected,
+                    tree.foldInOrder(Tree<Int>()) { t1 ->
+                        { i -> { t2 -> Tree(t2, i, t1) } }
+                    }
+            )
+        }
+
+        @Test
+        fun foldPreOrderWithInvokeOperatorReturnsOrderedTree() {
+            val tree = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(7)),
+                    6,
+                    Tree.T(Tree<Int>(3), 4, Tree<Int>(5)))
+            val expected = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(3)),
+                    4,
+                    Tree.T(Tree<Int>(5), 6, Tree<Int>(7)))
+
+            assertEquals(
+                    expected,
+                    tree.foldPreOrder(Tree<Int>()) { i ->
+                        { t1 -> { t2 -> Tree(t1, i, t2) } }
+                    }
+            )
+        }
+
+        @Test
+        fun mapProducesTreeOfMappedValues() {
+            val tree = Tree.T(
+                    Tree.T(Tree<Int>(1), 2, Tree<Int>(3)),
+                    4,
+                    Tree.T(Tree<Int>(5), 6, Tree<Int>(7)))
+            val mapped = Tree.T(
+                    Tree.T(Tree<Int>(1), 4, Tree<Int>(9)),
+                    16,
+                    Tree.T(Tree<Int>(25), 36, Tree<Int>(49)))
+
+            assertEquals(mapped.size, tree.map { it * it }.size)
+            assertEquals(
+                    mapped,
+                    tree.map { it * it }
+            )
+        }
+
+        @Test
+        fun treeIsBalandedAfterBalancing () {
+            assertFalse(Tree.isUnbalanced(Tree.balance(Tree(1,2,3,4,5,6,7))))
+        }
+
     }
+
 }
+
+
 
 interface FooBar {
     fun hello(n: Int)
