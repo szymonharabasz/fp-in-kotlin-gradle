@@ -19,6 +19,7 @@ import kotlin.IllegalStateException
 import com.example.project.option.sequence as option_sequence
 import org.mockito.Mockito.*
 import java.io.PrintStream
+import kotlin.math.exp
 
 @DisplayName("ALl the tests")
 class ExercisesTests {
@@ -1248,11 +1249,6 @@ class ExercisesTests {
         }
 
         @Test
-        fun treeContainsAddedElementsInCorrectOrder() {
-            assertEquals("(E 1 ((E 3 ((E 4 E) 5 E)) 6 E))", "${Tree<Int>() + 1 + 6 + 3 + 5 + 4 + 6}")
-        }
-
-        @Test
         fun treeContainsElementWithWhichWasConstructed() {
             assertTrue(Tree<Int>(1, 2, 3, 4, 5, 6, 7, 8).contains(4))
         }
@@ -1440,6 +1436,38 @@ class ExercisesTests {
         @Test
         fun treeIsBalandedAfterBalancing () {
             assertFalse(Tree.isUnbalanced(Tree.balance(Tree(1,2,3,4,5,6,7))))
+        }
+
+        @Test
+        fun rotatingRightBalancedHeight1TreeReturnsLinearTree() {
+            val tree = Tree.T(Tree(1), 2, Tree(3))
+            val expected = Tree.T( Tree(), 1, Tree.T( Tree(), 2, Tree(3) ) )
+            assertEquals(expected, tree.rotateRight())
+            assertFalse(Tree.isUnbalanced(tree))
+            assertTrue(Tree.isUnbalanced(tree.rotateRight()))
+        }
+
+        @Test
+        fun rotatingLeftBalancedHeight1TreeReturnsLinearTree() {
+            val tree = Tree.T(Tree(1), 2, Tree(3))
+            val expected = Tree.T( Tree.T(Tree(1), 2, Tree()),3, Tree() )
+            assertEquals(expected, tree.rotateLeft())
+            assertFalse(Tree.isUnbalanced(tree))
+            assertTrue(Tree.isUnbalanced(tree.rotateLeft()))
+        }
+
+        @Test
+        fun balancingLinear3ElementTreeProducesHeight1Tree() {
+            val tree = Tree(1, 2, 3)
+            val expected = Tree.T(Tree(1), 2, Tree(3))
+            println(tree)
+            println(expected)
+            println(Tree.balance(tree))
+            println(tree.toListInOrderRight())
+            println(tree.toListInOrderRight().foldLeft(Tree.Empty as Tree<Int>) { t: Tree<Int>, a: Int ->
+                Tree.T(Tree.Empty as Tree<Int>, a, t)
+            })
+            assertEquals(expected, Tree.balance(tree))
         }
 
     }

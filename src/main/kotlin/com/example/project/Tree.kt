@@ -1,6 +1,7 @@
 package com.example.project
 
 import com.example.project.result.Result
+import com.example.project.result.lift2
 import kotlin.IllegalStateException
 
 sealed class Tree<A: Comparable<A>> {
@@ -19,7 +20,7 @@ sealed class Tree<A: Comparable<A>> {
                 else -> T(tree.left, a, tree.right)
             }
         }
-        return plusUnbalanced(this, a)
+        return balance(plusUnbalanced(this, a))
     }
 
     fun max(): Result<A> = when (this) {
@@ -41,29 +42,35 @@ sealed class Tree<A: Comparable<A>> {
         }
     }
 
-    fun merge(tree: Tree<A>): Tree<A> = when (this) {
-        Empty -> tree
-        is T -> when (tree) {
-            Empty -> this
-            is T -> when {
-                tree.value > value -> T(left, value, right
-                        .merge(T(Empty as Tree<A>, tree.value, tree.right)))
-                        .merge(tree.left)
-                tree.value < value -> T(left
-                        .merge(T(tree.left, tree.value, Empty as Tree<A>)), value, right)
-                        .merge(tree.right)
-                else -> T(tree.left.merge(left), value, tree.right.merge(right))
+    fun merge(tree: Tree<A>): Tree<A> {
+        fun mergeUnbalanced(t1: Tree<A>, t2: Tree<A>): Tree<A> = when (t1) {
+            Empty -> t2
+            is T -> when (t2) {
+                Empty -> t1
+                is T -> when {
+                    t2.value > t1.value -> T(t1.left, t1.value, t1.right
+                            .merge(T(Empty as Tree<A>, t2.value, t2.right)))
+                            .merge(t2.left)
+                    t2.value < t1.value -> T(t1.left
+                            .merge(T(t2.left, t2.value, Empty as Tree<A>)), t1.value, t1.right)
+                            .merge(t2.right)
+                    else -> T(t2.left.merge(t1.left), t1.value, t2.right.merge(t1.right))
+                }
             }
         }
+        return balance(mergeUnbalanced(this, tree))
     }
 
-    fun remove(a: A): Tree<A> = when (this) {
-        Empty -> this
-        is T -> when {
-            a < value -> T(left.remove(a), value, right)
-            a > value -> T(left, value, right.remove(a))
-            else -> mergeOrdered(left, right)
+    fun remove(a: A): Tree<A> {
+        fun removeUnbalanced(tree: Tree<A>, a: A): Tree<A> = when (tree) {
+            Empty -> tree
+            is T -> when {
+                a < tree.value -> T(tree.left.remove(a), tree.value, tree.right)
+                a > tree.value -> T(tree.left, tree.value, tree.right.remove(a))
+                else -> mergeOrdered(tree.left, tree.right)
+            }
         }
+        return removeUnbalanced(this, a)
     }
 
     fun <B> foldLeft(
@@ -159,12 +166,13 @@ sealed class Tree<A: Comparable<A>> {
         private fun <A : Comparable<A>> lt(first: A, second: A, third: A): Boolean =
                 lt(first, second) && lt(second, third)
 
-        /*
+
         private fun <A : Comparable<A>> ordered(t1: Tree<A>, a: A, t2: Tree<A>) =
                 lift2<Boolean, Boolean, Boolean> { b1 -> { b2 -> b1 && b2 } }(
                         t1.max().map { it < a })(t2.min().map { a < it })
                         .getOrElse(t1.isEmpty() && t2.isEmpty())
- */
+
+
 
         operator fun <A : Comparable<A>> invoke(left: Tree<A>, a: A, right: Tree<A>) = when {
             ordered(left, a, right) -> T(left, a, right)
@@ -176,21 +184,6 @@ sealed class Tree<A: Comparable<A>> {
             Empty -> t2
             is T -> T(t1.left, t1.value, mergeOrdered(t1.right, t2))
         }
-
-        private fun <A : Comparable<A>> ordered(left: Tree<A>, a: A, right: Tree<A>) =
-                left.max().flatMap { lMax ->
-                    right.min().map { rMin ->
-                        lt(lMax, a, rMin)
-                    }
-                }.getOrElse(left.isEmpty() && right.isEmpty())
-                        ||
-                        left.min().mapEmpty().flatMap {
-                            right.min().map { lt(a, it) }
-                        }.getOrElse(false)
-                        ||
-                        right.min().mapEmpty().flatMap {
-                            left.max().map { lt(it, a) }
-                        }.getOrElse(false)
 
         fun <A> unfold(a: A, f: (A) -> Result<A>): A {
             tailrec fun <A> unfold(
@@ -217,7 +210,7 @@ sealed class Tree<A: Comparable<A>> {
         }
 
         fun <A : Comparable<A>> balance(tree: Tree<A>): Tree<A> =
-                balanceHelper(tree.toListInOrderRight().foldLeft(Empty as Tree<A>) { t: Tree<A>, a: A ->
+                balanceHelper(tree.toListInOrderRight().coFoldRight(Empty as Tree<A>) { a: A, t: Tree<A> ->
                     T(Empty as Tree<A>, a, t)
                 })
 
