@@ -10,6 +10,7 @@
 
 package com.example.project
 
+import com.example.project.blackredtree.MapEntry
 import com.example.project.option.*
 import com.example.project.result.Result
 import org.junit.jupiter.api.*
@@ -18,8 +19,7 @@ import java.math.BigInteger
 import kotlin.IllegalStateException
 import com.example.project.option.sequence as option_sequence
 import org.mockito.Mockito.*
-import java.io.PrintStream
-import kotlin.math.exp
+import com.example.project.blackredtree.Map as MyMap
 
 @DisplayName("ALl the tests")
 class ExercisesTests {
@@ -1241,6 +1241,7 @@ class ExercisesTests {
     }
 
     @Nested
+    @Disabled
     inner class Chapter10 {
 
         @Test
@@ -1468,6 +1469,23 @@ class ExercisesTests {
                 Tree.T(Tree.Empty as Tree<Int>, a, t)
             })
             assertEquals(expected, Tree.balance(tree))
+        }
+
+    }
+
+    @Nested
+    inner class Chapter11 {
+
+        @Test
+        fun keyPresentAfterAdding() {
+            assertTrue((MyMap<Int, Int>() + Pair(2, 3) + Pair(3, 4)).contains(2))
+        }
+
+        @Test
+        fun newValueForKeyAfterReset() {
+            assertEquals(
+                    Result(MapEntry.of(2, 5)),
+                    (MyMap<Int, Int>() + Pair(2, 3) + Pair (3, 4) + Pair(2, 5)).get(2))
         }
 
     }

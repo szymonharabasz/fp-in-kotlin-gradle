@@ -110,6 +110,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
     abstract fun rotateRight(): BlackRedTree<A>
 */
     operator fun plus(value: A): BlackRedTree<A> = add(value).blacken()
+    operator fun minus(value: A): BlackRedTree<A> = delete(value).blacken()
 
     private fun balance(color: Color, left: BlackRedTree<A>, value: A, right: BlackRedTree<A>): BlackRedTree<A> =
             when {
@@ -142,6 +143,24 @@ sealed class BlackRedTree<A: Comparable<A>> {
             a < value -> balance(color, left.add(a), value, right)
             a > value -> balance(color, left, value, right.add(a))
             else -> T(color, left, a, right)
+        }
+    }
+
+    fun get(a: A): Result<A> = when (this) {
+        is Empty -> Result()
+        is T -> when {
+            a < value -> left.get(a)
+            a > value -> right.get(a)
+            else -> Result(value)
+        }
+    }
+
+    fun delete(a: A): BlackRedTree<A> = when (this) {
+        is Empty -> E as BlackRedTree<A>
+        is T -> when {
+            a < value -> balance(color, left.delete(a), value, right)
+            a > value -> balance(color, left, value, right.delete(a))
+            else -> remove()
         }
     }
 
