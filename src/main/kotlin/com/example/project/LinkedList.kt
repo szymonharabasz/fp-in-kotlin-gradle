@@ -139,6 +139,19 @@ sealed class LinkedList<A> {
         }).first.first.let { Pair(it.first.reverse(), it.second) }
     }
 
+    fun splitWhen(p: (A) -> Boolean): Pair<LinkedList<A>, LinkedList<A>> {
+        fun go(acc: LinkedList<A>, decc: LinkedList<A>): Pair<LinkedList<A>, LinkedList<A>> = when (decc){
+            Nil -> Pair(acc, decc)
+            is Cons -> decc.head.let {
+                if (p(it))
+                    Pair(acc, decc)
+                else
+                    go(acc.cons(it), decc.tail)
+            }
+        }
+        return go(Companion(), this).let { Pair(it.first.reverse(), it.second) }
+    }
+
     private fun splitListAt(n: Int): LinkedList<LinkedList<A>> = splitAt(n).let { LinkedList(it.first, it.second) }
 
     fun divide(depth: Int): LinkedList<LinkedList<A>> {
@@ -172,7 +185,7 @@ sealed class LinkedList<A> {
             }
             else -> acc
         }
-        return go(LinkedList(depth), LinkedList.Companion(), LinkedList(this)).reverse()
+        return go(LinkedList(depth), Companion(), LinkedList(this)).reverse()
     }
 
     fun startsWith(sub: LinkedList<A>): Boolean {
@@ -203,7 +216,7 @@ sealed class LinkedList<A> {
 
     fun <B> groupBy(f: (A) -> B): MyLinkedMap<B, LinkedList<A>> = coFoldRight(MyLinkedMap<B, LinkedList<A>>()) { a, map ->
         f(a).let {
-            map.set(it, map.get(it).getOrElse(LinkedList.Companion<A>()).cons(a))
+            map.set(it, map.get(it).getOrElse(Companion<A>()).cons(a))
         }
     }
 
@@ -398,7 +411,7 @@ data class MyPair<B>(val first: B, val second: Int) {
 class MyLinkedMap<K, V> {
     private val list: LinkedList<Pair<K, V>>
     constructor() {
-        this.list = LinkedList.Companion()
+        this.list = LinkedList.invoke<Pair<K, V>>()
     }
 
     private constructor(l: LinkedList<Pair<K, V>>) {

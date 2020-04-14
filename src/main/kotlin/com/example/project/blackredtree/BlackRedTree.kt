@@ -146,7 +146,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
         }
     }
 
-    fun get(a: A): Result<A> = when (this) {
+    operator fun get(a: A): Result<A> = when (this) {
         is Empty -> Result()
         is T -> when {
             a < value -> left.get(a)

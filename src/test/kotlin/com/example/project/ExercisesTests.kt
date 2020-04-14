@@ -1484,7 +1484,7 @@ class ExercisesTests {
         @Test
         fun newValueForKeyAfterReset() {
             assertEquals(
-                    Result(MapEntry.of(2, 5)),
+                    Result(5),
                     (MyMap<Int, Int>() + Pair(2, 3) + Pair (3, 4) + Pair(2, 5)).get(2))
         }
 
@@ -1507,6 +1507,27 @@ class ExercisesTests {
             assertEquals(
                     LinkedList(22,14,56,38,412),
                     (MyMap<Int, Int>() + Pair(4, 14) + Pair(2,22) + Pair(8, 38) + Pair(12, 412) + Pair(6, 56)).values())
+        }
+
+        @Test
+        fun keysAreReturnedInOrderIfTheyHaveSameHashCode() {
+
+            class MyInt(val value: Int) {
+                override fun hashCode() = 42
+                override fun toString() = value.toString()
+            }
+
+            assertEquals(
+                    LinkedList(MyInt(2),MyInt(4),MyInt(6),MyInt(8),MyInt(12)),
+                    (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2),22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).keys())
+        }
+
+        @Test
+        fun splitWhenSplitsLinkedListBeforeTheConditionIsFulfilled() {
+            assertEquals(
+                    Pair(LinkedList(2,3,4,5), LinkedList(6,7,8,9,10,11)),
+                    LinkedList(2,3,4,5,6,7,8,9,10,11).splitWhen { it % 6 == 0 }
+            )
         }
 
     }
