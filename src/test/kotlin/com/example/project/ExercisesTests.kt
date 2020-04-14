@@ -1488,11 +1488,30 @@ class ExercisesTests {
                     (MyMap<Int, Int>() + Pair(2, 3) + Pair (3, 4) + Pair(2, 5)).get(2))
         }
 
+        @Test
+        fun keysAreReturnedInOrder() {
+            assertEquals(
+                    LinkedList(2,4,6,8,12),
+                    (MyMap<Int, Int>() + Pair(4, 14) + Pair(2,22) + Pair(8, 38) + Pair(12, 412) + Pair(6, 56)).keys())
+        }
+
+        @Test
+        fun sizeOfMapIsCorrect() {
+            assertEquals(
+                    5,
+                    (MyMap<Int, Int>() + Pair(4, 14) + Pair(2,22) + Pair(8, 38) + Pair(12, 412) + Pair(6, 56)).size())
+        }
+
+        @Test
+        fun valuesAreReturnedByOrderOfKeys() {
+            assertEquals(
+                    LinkedList(22,14,56,38,412),
+                    (MyMap<Int, Int>() + Pair(4, 14) + Pair(2,22) + Pair(8, 38) + Pair(12, 412) + Pair(6, 56)).values())
+        }
+
     }
 
 }
-
-
 
 interface FooBar {
     fun hello(n: Int)

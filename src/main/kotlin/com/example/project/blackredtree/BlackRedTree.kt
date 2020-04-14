@@ -85,7 +85,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
             f: (B) -> (A) -> B,
             g: (B) -> (B) -> B): B = when (this) {
         is Empty -> identity
-        is T -> f(g(left.foldLeft(identity, f, g))(right.foldLeft(identity, f, g)))(value)
+        is T -> g(left.foldLeft(identity, f, g))(f(right.foldLeft(identity, f, g))(value))
     }
 /*
     fun <B : Comparable<B>> map(f: (A) -> B): BlackRedTree<B> =
@@ -254,7 +254,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
 
         override val isEmpty: Boolean = false
 
-        override fun toString(): String = "($color $left $value $right)"
+        override fun toString(): String = "{$color $left $value $right}"
         override val size: Int = 1 + left.size + right.size
         override val height: Int = 1 + left.height.coerceAtLeast(right.height)
         /*

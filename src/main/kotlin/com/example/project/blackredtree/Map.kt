@@ -1,5 +1,6 @@
 package com.example.project.blackredtree
 
+import com.example.project.LinkedList
 import com.example.project.result.Result
 
 class Map<K: Comparable<K>, V>(
@@ -18,6 +19,35 @@ class Map<K: Comparable<K>, V>(
 
     fun size(): Int = delegate.size
 
+    fun <B> foldLeft(
+            identity: B,
+            f: (B) -> (MapEntry<K, V>) -> B,
+            g: (B) -> (B) -> B): B = delegate.foldLeft(identity, f, g)
+
+    fun values(): LinkedList<V> = foldLeft(
+            LinkedList<V>(),
+            { list ->
+                { me ->
+                    me.value.let {
+                        when (it) {
+                            is Result.Success<V> -> list.cons(it.value)
+                            else -> list
+                        }
+                    }
+
+                }
+            },
+            { list1 -> { list2 -> list1.concat(list2) } }
+    )
+
+    fun keys(): LinkedList<K> = foldLeft(
+            LinkedList<K>(),
+            { list ->
+                { me -> list.cons(me.key) }
+            },
+            { list1 -> { list2 -> list1.concat(list2) } }
+    )
+
     companion object {
         operator fun invoke(): Map<Nothing, Nothing> = Map()
     }
@@ -25,7 +55,7 @@ class Map<K: Comparable<K>, V>(
 }
 
 class MapEntry<K: Comparable<K>, V>
-private constructor(private val key: K, val value: Result<V>): Comparable<MapEntry<K, V>> {
+private constructor(internal val key: K, val value: Result<V>): Comparable<MapEntry<K, V>> {
 
     override fun compareTo(other: MapEntry<K, V>): Int = key.compareTo(other.key)
 
