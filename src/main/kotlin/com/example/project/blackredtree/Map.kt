@@ -17,7 +17,7 @@ class Map<K: Any, V>(
                                 entry.first.let { entry_key ->
                                     current.first.let { current_key ->
                                         val b = (entry_key is Comparable<*> && current_key is Comparable<*>
-                                                && entry_key <= current_key)
+                                                && entry_key <= current_key as Nothing)
                                         b
                                     }
                                 }

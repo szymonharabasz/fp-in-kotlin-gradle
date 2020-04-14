@@ -1512,9 +1512,10 @@ class ExercisesTests {
         @Test
         fun keysAreReturnedInOrderIfTheyHaveSameHashCode() {
 
-            class MyInt(val value: Int) {
+            class MyInt(val value: Int): Comparable<MyInt> {
                 override fun hashCode() = 42
                 override fun toString() = value.toString()
+                override fun compareTo(other: MyInt): Int = value.compareTo(other.value)
             }
 
             assertEquals(
