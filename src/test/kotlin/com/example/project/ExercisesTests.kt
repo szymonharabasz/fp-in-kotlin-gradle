@@ -11,6 +11,7 @@
 package com.example.project
 
 import com.example.project.blackredtree.MapEntry
+import com.example.project.blackredtree.plus
 import com.example.project.option.*
 import com.example.project.result.Result
 import org.junit.jupiter.api.*
@@ -1516,6 +1517,80 @@ class ExercisesTests {
                 override fun hashCode() = 42
                 override fun toString() = value.toString()
                 override fun compareTo(other: MyInt): Int = value.compareTo(other.value)
+                override fun equals(other: Any?): Boolean = when (other) {
+                    is MyInt -> value == other.value
+                    else -> false
+                }
+            }
+
+            assertEquals(
+                    LinkedList(MyInt(2),MyInt(4),MyInt(6),MyInt(8),MyInt(12)),
+                    (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2),22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).keys())
+        }
+
+        @Test
+        fun valuesAreReturnedInOrderOfKeysIfTheyHaveSameHashCode() {
+
+            class MyInt(val value: Int): Comparable<MyInt> {
+                override fun hashCode() = 42
+                override fun toString() = value.toString()
+                override fun compareTo(other: MyInt): Int = value.compareTo(other.value)
+                override fun equals(other: Any?): Boolean = when (other) {
+                    is MyInt -> value == other.value
+                    else -> false
+                }
+            }
+
+            assertEquals(
+                    LinkedList(22,14,56,38,412),
+                    (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2),22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).values())
+        }
+
+        @Test
+        fun keysAreReturnedInReverseOrderOfAddingIfTheyAreNotComparableAndHaveSameHashCode() {
+
+            class MyInt(val value: Int) {
+                override fun hashCode() = 42
+                override fun toString() = value.toString()
+                override fun equals(other: Any?): Boolean = when (other) {
+                    is MyInt -> value == other.value
+                    else -> false
+                }
+            }
+
+            assertEquals(
+                    LinkedList(MyInt(6),MyInt(12),MyInt(8),MyInt(2),MyInt(4)),
+                    (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2),22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).keys())
+        }
+
+        @Test
+        fun valuesAreReturnedInReverseOrderOfAddingIfTheyAreNotComparableAndHaveSameHashCode() {
+
+            class MyInt(val value: Int) {
+                override fun hashCode() = 42
+                override fun toString() = value.toString()
+                override fun equals(other: Any?): Boolean = when (other) {
+                    is MyInt -> value == other.value
+                    else -> false
+                }
+            }
+
+            assertEquals(
+                    LinkedList(56, 412, 38, 22, 14),
+                    (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2), 22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).values())
+        }
+
+        @Test
+        fun keysAreReturnedInOrderIfTheyHaveHashCodeFromLimitedSet() {
+
+            class MyInt(val value: Int): Comparable<MyInt> {
+                override fun hashCode() = value % 2
+                override fun toString() = value.toString()
+                override fun compareTo(other: MyInt): Int = value.compareTo(other.value)
+                override fun equals(other: Any?): Boolean = when (other) {
+                    is MyInt -> value == other.value
+                    else -> false
+                }
             }
 
             assertEquals(
@@ -1531,6 +1606,24 @@ class ExercisesTests {
             )
         }
 
+
+        @Test
+        fun overloadedMethodCanBeSelectedByWhen() {
+
+            val fooBarImpl = FooBarImpl()
+            val fooBarComparable = FooBarComparable()
+
+            val testerImpl = Tester<FooBarImpl>(1)
+            val testerComparable = Tester<FooBarComparable>(1)
+            val testerSum = testerImpl + testerImpl
+            val testerSumComparable = testerComparable + testerComparable
+
+            assertEquals(4, testerImpl.test(fooBarImpl))
+            assertEquals(5, testerComparable.test(fooBarComparable))
+            assertEquals(6, testerSum.test(fooBarComparable))
+            assertEquals(8, testerSumComparable.test(fooBarComparable))
+        }
+
     }
 
 }
@@ -1538,3 +1631,22 @@ class ExercisesTests {
 interface FooBar {
     fun hello(n: Int)
 }
+
+open class FooBarImpl: FooBar {
+    override fun hello(n: Int) {}
+}
+
+class FooBarComparable: FooBarImpl(), Comparable<FooBarComparable> {
+    override fun compareTo(other: FooBarComparable): Int = 0
+}
+
+class Tester<T> (val value: Int) {
+    fun <T> test(t: T): Int = value + 3
+    fun <T> test(t: T): Int
+            where T: kotlin.Comparable<T> = value + 4
+}
+operator fun <T> Tester<T>.plus(other: Tester<T>): Tester<T> =
+        Tester<T>(this.value + other.value)
+@JvmName("plusComparable")
+operator fun <V> Tester<V>.plus(other: Tester<V>): Tester<V> where V: Comparable<V> =
+        Tester<V>(2*(this.value + other.value))

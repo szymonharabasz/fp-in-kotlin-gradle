@@ -6,27 +6,9 @@ import com.example.project.result.Result
 typealias MyMapEntry<K, V> = MapEntry<Int, LinkedList<Pair<K, V>>>
 
 class Map<K: Any, V>(
-        private val delegate: BlackRedTree<MyMapEntry<K, V>> = BlackRedTree.invoke()
+        internal val delegate: BlackRedTree<MyMapEntry<K, V>> = BlackRedTree.invoke()
 ) {
-
-    operator fun plus(entry: Pair<K, V>): Map<K, V> =
-            Map(delegate + MapEntry.of(entry.first.hashCode(),
-                    delegate[MapEntry(entry.first.hashCode())].flatMap { x -> x.value }
-                            .getOrElse(LinkedList<Pair<K, V>>()).filter { it.first != entry.first }
-                            .splitWhen { current ->
-                                entry.first.let { entry_key ->
-                                    current.first.let { current_key ->
-                                        val b = (entry_key is Comparable<*> && current_key is Comparable<*>
-                                                && entry_key <= current_key as Nothing)
-                                        b
-                                    }
-                                }
-                            }.let {
-                                it.first.concat(it.second.cons(entry))
-                            }
-            ))
-
-    operator fun minus(key: K): Map<K, V> = delegate[MapEntry(key.hashCode())].flatMap { x -> x.value }
+        operator fun minus(key: K): Map<K, V> = delegate[MapEntry(key.hashCode())].flatMap { x -> x.value }
             .getOrElse(LinkedList<Pair<K, V>>()).filter { it.first != key }.let {
                 when {
                     it.isEmpty() -> Map(delegate - MapEntry(key.hashCode()))
@@ -98,6 +80,30 @@ class Map<K: Any, V>(
     }
 
 }
+
+operator fun <K: Any, V> Map<K, V>.plus(entry: Pair<K, V>): Map<K, V> =
+        Map(delegate + MapEntry.of(entry.first.hashCode(),
+                delegate[MapEntry(entry.first.hashCode())].flatMap { x -> x.value }
+                        .getOrElse(LinkedList<Pair<K, V>>()).filter { it.first != entry.first }
+                        .cons(entry)
+        ))
+
+@JvmName("plusComparable")
+operator fun <K, V> Map<K, V>.plus(entry: Pair<K, V>): Map<K, V>
+        where K: Comparable<K> =
+        Map(delegate + MapEntry.of(entry.first.hashCode(),
+                delegate[MapEntry(entry.first.hashCode())].flatMap { x -> x.value }
+                        .getOrElse(LinkedList<Pair<K, V>>()).filter { it.first != entry.first }
+                        .splitWhen { current ->
+                            entry.first.let { entry_key ->
+                                current.first.let { current_key ->
+                                    entry_key <= current_key
+                                }
+                            }
+                        }.let {
+                            it.first.concat(it.second.cons(entry))
+                        }
+        ))
 
 class MapEntry<K: Any, V>
 private constructor(internal val key: K, val value: Result<V>): Comparable<MapEntry<K, V>> {
