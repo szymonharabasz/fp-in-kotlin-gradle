@@ -1624,6 +1624,42 @@ class ExercisesTests {
             assertEquals(8, testerSumComparable.test(fooBarComparable))
         }
 
+        @Test
+        fun headOfHeapWithOneElementReturnsSuccess() {
+            assertEquals(
+                    Result(5),
+                    Heap.Companion(5).head)
+        }
+
+        @Test
+        fun headOfHeapWithFewElementsIsSmallestOne() {
+            assertEquals(
+                    Result(2),
+                    (Heap.Companion(5) + 4 + 6 + 2 + 7).head)
+        }
+
+        @Test
+        fun getReturnsCorrectElementFromHeap() {
+            assertEquals(
+                    Result(6),
+                    (Heap.Companion(5) + 4 + 6 + 2 + 7).get(3))
+        }
+
+        @Test
+        fun popOnOneElementHeapRetursnSomeOfPairOfElementAndEmptyHeap() {
+            assertEquals(
+                    Option.Some(Pair(5, Heap.E as Heap<Int>)),
+                    Heap.Companion(5).pop()
+            )
+        }
+
+        @Test
+        fun toListReturnsListOfSortedElements() {
+            assertEquals(
+                    LinkedList(2,4,5,6,7),
+                    (Heap.Companion(5) + 4 + 6 + 2 + 7).toList())
+        }
+
     }
 
 }
