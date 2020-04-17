@@ -28,7 +28,7 @@ sealed class Result<A>: Serializable {
         override fun isEmpty(): Boolean = false
     }
 
-    internal object Empty: Result<Nothing>() {
+    object Empty: Result<Nothing>() {
         override fun toString(): String = "Empty"
         override fun isEmpty(): Boolean = true
     }

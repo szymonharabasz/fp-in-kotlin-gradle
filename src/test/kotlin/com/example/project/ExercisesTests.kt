@@ -1648,7 +1648,7 @@ class ExercisesTests {
         @Test
         fun popOnOneElementHeapRetursnSomeOfPairOfElementAndEmptyHeap() {
             assertEquals(
-                    Option.Some(Pair(5, Heap.E as Heap<Int>)),
+                    Option.Some(Pair(5, Heap.Empty<Int>())),
                     Heap.Companion(5).pop()
             )
         }
@@ -1658,6 +1658,61 @@ class ExercisesTests {
             assertEquals(
                     LinkedList(2,4,5,6,7),
                     (Heap.Companion(5) + 4 + 6 + 2 + 7).toList())
+        }
+
+        @Test
+        fun valuesAreReturnedInOrderIfTheyAreNotComparable() {
+
+            class MyInt(val value: Int) {
+                override fun hashCode() = 42
+                override fun toString() = value.toString()
+                override fun equals(other: Any?): Boolean = when (other) {
+                    is MyInt -> value == other.value
+                    else -> false
+                }
+            }
+
+            class MyComparator: Comparator<MyInt> {
+                override fun compare(p0: MyInt?, p1: MyInt?): Int = p0!!.value.compareTo(p1!!.value)
+            }
+
+            assertEquals(
+                    LinkedList(MyInt(2),MyInt(4),MyInt(5),MyInt(6),MyInt(7)),
+                    (Heap.Companion(MyInt(5), MyComparator()) + MyInt(4) + MyInt(6) + MyInt(2) + MyInt(7)).toList())
+        }
+
+        @Test
+        fun valuesAreReturnedInOrderSpecifiedByComparatorIfTheyAreNotComparable() {
+
+            class MyInt(val value: Int) {
+                override fun hashCode() = 42
+                override fun toString() = value.toString()
+                override fun equals(other: Any?): Boolean = when (other) {
+                    is MyInt -> value == other.value
+                    else -> false
+                }
+            }
+
+            class MyComparator: Comparator<MyInt> {
+                override fun compare(p0: MyInt?, p1: MyInt?): Int = -p0!!.value.compareTo(p1!!.value)
+            }
+
+            assertEquals(
+                    LinkedList(MyInt(2),MyInt(4),MyInt(5),MyInt(6),MyInt(7)).reverse(),
+                    (Heap.Companion(MyInt(5), MyComparator()) + MyInt(4) + MyInt(6) + MyInt(2) + MyInt(7)).toList())
+        }
+
+        @Test
+        fun valuesAreReturnedInOrderSpecifiedByComparatorEvenIfTheyAreComparable() {
+
+            class MyComparator: Comparator<Int> {
+                override fun compare(p0: Int?, p1: Int?): Int = -p0!!.compareTo(p1!!)
+                override fun toString(): String = "MyComparator"
+            }
+
+            assertEquals(
+                    LinkedList(2, 4, 5, 6, 7).reverse(),
+                    (Heap.Companion(5, MyComparator()) + 2 + 6 + 4 + 7).toList())
         }
 
     }
