@@ -1748,6 +1748,41 @@ class ExercisesTests {
             val fooBar = mock(FooBar::class.java)
             assertDoesNotThrow { myRange(0,100000).forEach { fooBar.hello(it) } }
         }
+
+        @Test
+        fun functionIsNotInvokedWhenIOisNotInvoked() {
+            val fooBar = mock(FooBar::class.java)
+            val io = IO { fooBar.hello(2) }
+            verify(fooBar, times(0)).hello(2)
+        }
+
+        @Test
+        fun functionIsInvokedOnceWhenIOisInvoked() {
+            val fooBar = mock(FooBar::class.java)
+            val io = IO { fooBar.hello(2) }
+            verify(fooBar, times(0)).hello(2)
+            io()
+            verify(fooBar, times(1)).hello(2)
+        }
+
+        @Test
+        fun functionIsInvokedNtimesWhenIOisInvoked() {
+            val n = 7
+            val fooBar = mock(FooBar::class.java)
+            val io = IO.repeat(n, IO { fooBar.hello(2) })
+            verify(fooBar, times(0)).hello(2)
+            io()
+            verify(fooBar, times(n)).hello(2)
+        }
+
+        @Test
+        fun repeatDoesNotOverflowTheStack() {
+            val n = 1000000
+            val fooBar = mock(FooBar::class.java)
+            val io = IO.repeat(n, IO { fooBar.hello(2) })
+            io()
+            verify(fooBar, times(n)).hello(2)
+        }
     }
 
 }
