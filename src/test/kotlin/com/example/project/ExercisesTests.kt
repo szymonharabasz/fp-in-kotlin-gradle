@@ -1462,13 +1462,6 @@ class ExercisesTests {
         fun balancingLinear3ElementTreeProducesHeight1Tree() {
             val tree = Tree(1, 2, 3)
             val expected = Tree.T(Tree(1), 2, Tree(3))
-            println(tree)
-            println(expected)
-            println(Tree.balance(tree))
-            println(tree.toListInOrderRight())
-            println(tree.toListInOrderRight().foldLeft(Tree.Empty as Tree<Int>) { t: Tree<Int>, a: Int ->
-                Tree.T(Tree.Empty as Tree<Int>, a, t)
-            })
             assertEquals(expected, Tree.balance(tree))
         }
 
@@ -1715,6 +1708,46 @@ class ExercisesTests {
                     (Heap.Companion(5, MyComparator()) + 2 + 6 + 4 + 7).toList())
         }
 
+        @Test
+        fun derivativeCanHaveUpperBoundOnTypeParameter() {
+            val fooBar = mock(FooBar::class.java)
+
+            val base = Base<Int>(fooBar)
+            val derived: Base<Int> = base.makeDerived(fooBar)
+            derived.action()
+
+            val base2 = Base<FooBar>(fooBar)
+            val derived2: Base<FooBar> = base2.makeDerived(fooBar)
+            derived2.action()
+
+            verify(fooBar, times(0)).hello(1)
+            verify(fooBar, times(1)).hello(2)
+            verify(fooBar, times(1)).hello(3)
+
+        }
+
+    }
+    @Nested
+    inner class Chapter12 {
+        @Test
+        fun forEachIsCalledForEachElementOfList() {
+            val fooBar = mock(FooBar::class.java)
+            LinkedList(2,3,4,5,6,7).forEach { fooBar.hello(it) }
+            verify(fooBar, times(0)).hello(1)
+            verify(fooBar, times(1)).hello(2)
+            verify(fooBar, times(1)).hello(3)
+            verify(fooBar, times(1)).hello(4)
+            verify(fooBar, times(1)).hello(5)
+            verify(fooBar, times(1)).hello(6)
+            verify(fooBar, times(1)).hello(7)
+            verify(fooBar, times(0)).hello(8)
+        }
+
+        @Test
+        fun forEachIsStackSafe() {
+            val fooBar = mock(FooBar::class.java)
+            assertDoesNotThrow { myRange(0,100000).forEach { fooBar.hello(it) } }
+        }
     }
 
 }
@@ -1741,3 +1774,21 @@ operator fun <T> Tester<T>.plus(other: Tester<T>): Tester<T> =
 @JvmName("plusComparable")
 operator fun <V> Tester<V>.plus(other: Tester<V>): Tester<V> where V: Comparable<V> =
         Tester<V>(2*(this.value + other.value))
+
+open class Base <A>(val fooBar: FooBar) {
+    fun action() { worker() }
+    open fun worker() { fooBar.hello(1) }
+    companion object {
+
+    }
+}
+class Derived1 <A: Comparable<A>>(fooBar: FooBar) : Base<A>(fooBar) {
+    override fun worker() { fooBar.hello(2) }
+}
+class Derived2 <A>(fooBar: FooBar) : Base<A>(fooBar) {
+    override fun worker() { fooBar.hello(3) }
+}
+
+@JvmName("derivedComparable")
+fun <A: Comparable<A>> Base<A>.makeDerived(fooBar: FooBar): Base<A> = Derived1<A>(fooBar)
+fun <A> Base<A>.makeDerived(fooBar: FooBar): Base<A> = Derived2<A>(fooBar)

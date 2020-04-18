@@ -220,6 +220,18 @@ sealed class LinkedList<A> {
         }
     }
 
+    fun forEach(f: (A) -> Unit): Unit {
+        tailrec fun go(list: LinkedList<A>): Unit = when (list) {
+            Nil -> {
+            }
+            is Cons -> {
+                f(list.head)
+                go(list.tail)
+            }
+        }
+        go(this)
+    }
+
     internal object Nil : LinkedList<Nothing>() {
 
         override fun isEmpty(): Boolean = true
@@ -254,6 +266,7 @@ sealed class LinkedList<A> {
         override val length: Int = 1 + tail.length
 
         override fun headSafe(): Result<A> = Result(head)
+
 
     }
 
@@ -351,11 +364,6 @@ fun <A> sequence2(list: LinkedList<Result<A>>): Result<LinkedList<A>> =
         list.filter{ it !is Result.Empty }.reverse().foldLeft(Result(LinkedList())) { l, ra ->
             map2(ra, l) { a -> { la: LinkedList<A> -> la.cons(a) }}
 }
-/*
-fun <A, B> traverse(list: LinkedList<A>, f: (A) -> Result<B>): Result<LinkedList<B>> = list.coFoldRight(Result(LinkedList<B>())) { a, l ->
-    map2(f(a), l) { b -> { lb: LinkedList<B> -> lb.cons(b) }}
-}
-*/
 
 fun <A, B> traverse(list: LinkedList<A>, f: (A) -> Result<B>): Result<LinkedList<B>> =
         list.reverse().coFoldRight(Result(LinkedList<B>()), Result()) { a, l ->
@@ -382,7 +390,7 @@ fun <A, B, C> product(lista: LinkedList<A>, listb: LinkedList<B>, f: (A) -> (B) 
 fun <A, B> unzip(list: LinkedList<Pair<A, B>>): Pair<LinkedList<A>, LinkedList<B>> = list.unzip { it }
 
 fun <A, S> unfold (z: S, f: (S) -> Option<Pair<A, S>>): LinkedList<A> {
-    fun go(s: S, acc: LinkedList<A>): LinkedList<A> {
+    tailrec fun go(s: S, acc: LinkedList<A>): LinkedList<A> {
         return when (val fs = f(s)) {
             is Option.Some -> go(fs.value.second, acc.cons(fs.value.first))
             else -> acc

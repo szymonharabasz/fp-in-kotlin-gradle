@@ -162,6 +162,7 @@ internal fun <A: Comparable<A>> Heap.H<A>.tail(): Result<Heap<A>> = when (this) 
     is Heap.H -> Result(Heap.merge(lt, rg))
     else -> Result.failure("tail called on empty heap")
 }
+
 @JvmName("getComparator")
 fun <A> Heap<A>.get(index: Int): Result<A> = when (this) {
     is Heap.H -> when (index) {
@@ -177,6 +178,7 @@ fun <A: Comparable<A>> Heap<A>.get(index: Int): Result<A> = when (this) {
     }
     else -> Result.failure("element not found")
 }
+
 @JvmName("popComparator")
 fun <A> Heap<A>.pop(): Option<Pair<A, Heap<A>>> = when (this) {
     is Heap.H -> Option.Some(Pair(hd, Heap.merge(lt, rg)))
@@ -186,6 +188,7 @@ fun <A: Comparable<A>> Heap<A>.pop(): Option<Pair<A, Heap<A>>> = when (this) {
     is Heap.H -> Option.Some(Pair(hd, Heap.merge(lt, rg)))
     else -> Option.None as Option<Pair<A, Heap<A>>>
 }
+
 @JvmName("toListComparator")
 fun <A> Heap<A>.toList(): LinkedList<A> = foldLeft(LinkedList<A>()) { list ->
     { element -> list.cons(element) }
@@ -193,6 +196,7 @@ fun <A> Heap<A>.toList(): LinkedList<A> = foldLeft(LinkedList<A>()) { list ->
 fun <A: Comparable<A>> Heap<A>.toList(): LinkedList<A> = foldLeft(LinkedList<A>()) { list ->
     { element -> list.cons(element) }
 }.reverse()
+
 @JvmName("foldLeftComparator")
 fun <A, B> Heap<A>.foldLeft(identity: B, f: (B) -> (A) -> B): B =
         unfold(this, identity, { it.pop() }, f)
