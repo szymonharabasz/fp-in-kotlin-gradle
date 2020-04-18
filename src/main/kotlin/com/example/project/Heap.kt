@@ -18,16 +18,16 @@ sealed class Heap<A> {
         val strLeft = left.map { "$it" }.getOrElse("F")
         val strHead = head.map { "$it" }.getOrElse("F")
         val strRight = right.map { "$it" }.getOrElse("F")
-        return "{$rank $strLeft $strHead $strRight $comparator}"
+        return "H{$rank $strLeft $strHead $strRight $comparator}"
     }
 
-    class Empty<A>(
+    open class Empty<A>(
             override val comparator: Result<Comparator<A>> =
                     Result.Empty as Result<Comparator<A>>) : Heap<A>() {
 
         override fun equals(other: Any?): Boolean = other is Empty<*>
         override fun hashCode(): Int = 41
-        override fun toString(): String = "{E $comparator}"
+        override fun toString(): String = "H{E $comparator}"
         override val isEmpty: Boolean = true
         override val left: Result<Heap<A>> = Result.failure("left called on empty heap")
         override val right: Result<Heap<A>> = Result.failure("right called on empty heap")
@@ -37,11 +37,15 @@ sealed class Heap<A> {
 
     }
 
-    internal class H<A>(
+    class EmptyComparable<A : Comparable<A>> : Empty<A>() {
+        override fun toString(): String = "HC{E $comparator}"
+    }
+
+    internal open class H<A>(
             override val rank: Int,
-            internal val lt: Heap<A>,
-            internal val hd: A,
-            internal val rg: Heap<A>,
+            internal open val lt: Heap<A>,
+            internal open val hd: A,
+            internal open val rg: Heap<A>,
             override val comparator: Result<Comparator<A>> =
                     lt.comparator.orElse { rg.comparator }) : Heap<A>() {
 
@@ -53,17 +57,35 @@ sealed class Heap<A> {
         override fun hashCode(): Int = hd.hashCode() + 41 * lt.hashCode() + 43 * rg.hashCode()
         override val left: Result<Heap<A>> = Result(lt)
         override val right: Result<Heap<A>> = Result(rg)
-        override val head: Result<A> = Result(hd)
-        override val size: Int = lt.size + rg.size + 1
+        override val head: Result<A> by lazy { Result(hd) }
+        override val size: Int by lazy {
+            println("lt = $lt, rg = $rg")
+            lt.size + rg.size + 1
+        }
         override val isEmpty: Boolean = false
+    }
 
+    internal class HComparable<A: Comparable<A>>(
+            override val rank: Int,
+            override val lt: Heap<A>,
+            override val hd: A,
+            override val rg: Heap<A>,
+            override val comparator: Result<Comparator<A>> =
+                    lt.comparator.orElse { rg.comparator }
+    ) : H<A>(rank, lt, hd, rg, comparator) {
+        override fun toString(): String {
+            val strLeft = left.map { "$it" }.getOrElse("F")
+            val strHead = head.map { "$it" }.getOrElse("F")
+            val strRight = right.map { "$it" }.getOrElse("F")
+            return "HC{$rank $strLeft $strHead $strRight $comparator}"
+        }
     }
 
     companion object {
-        operator fun <A : Comparable<A>> invoke(): Heap<A> = Empty()
+        operator fun <A : Comparable<A>> invoke(): Heap<A> = EmptyComparable()
 
         operator fun <A : Comparable<A>> invoke(element: A): Heap<A> =
-                H(1, Empty(), element, Empty())
+                HComparable(1, EmptyComparable(), element, EmptyComparable())
 
         operator fun <A> invoke(comparator: Comparator<A>) = Empty(Result(comparator))
 
@@ -83,6 +105,18 @@ sealed class Heap<A> {
                         Empty(comparator),
                         comparator)
 
+
+        private fun <A: Comparable<A>> mergeHelper(
+                left: Heap<A>,
+                head: A,
+                right: Heap<A>,
+                comparator: Result<Comparator<A>> =
+                        left.comparator.orElse { right.comparator }): Heap<A> = when {
+            left.rank < right.rank -> HComparable(left.rank + 1, right, head, left)
+            else -> HComparable(right.rank + 1, left, head, right)
+        }
+
+        @JvmName("mergeComparator")
         private fun <A> mergeHelper(
                 left: Heap<A>,
                 head: A,

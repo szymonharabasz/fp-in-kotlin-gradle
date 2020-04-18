@@ -15,6 +15,12 @@ class IO<A>(private val f: () -> A) {
         fun <A> repeat(n: Int, io: IO<A>): IO<LinkedList<A>> = IO {
             myRange(0, n).map { io() }
         }
+        /*
+        fun <A> doWhile(f: (A) -> Boolean, io: IO<A>) = unfold(LinkedList.Nil) {
+
+        }
+
+         */
 
     }
 }

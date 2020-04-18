@@ -1728,6 +1728,7 @@ class ExercisesTests {
 
     }
     @Nested
+    @Disabled
     inner class Chapter12 {
         @Test
         fun forEachIsCalledForEachElementOfList() {
