@@ -1468,6 +1468,7 @@ class ExercisesTests {
     }
 
     @Nested
+    @Disabled
     inner class Chapter11 {
 
         @Test
@@ -1727,8 +1728,8 @@ class ExercisesTests {
         }
 
     }
+
     @Nested
-    @Disabled
     inner class Chapter12 {
         @Test
         fun forEachIsCalledForEachElementOfList() {
@@ -1747,7 +1748,7 @@ class ExercisesTests {
         @Test
         fun forEachIsStackSafe() {
             val fooBar = mock(FooBar::class.java)
-            assertDoesNotThrow { myRange(0,100000).forEach { fooBar.hello(it) } }
+            assertDoesNotThrow { myRange(0,10000).forEach { fooBar.hello(it) } }
         }
 
         @Test
@@ -1778,11 +1779,21 @@ class ExercisesTests {
 
         @Test
         fun repeatDoesNotOverflowTheStack() {
-            val n = 1000000
+            val n = 10000
             val fooBar = mock(FooBar::class.java)
             val io = IO.repeat(n, IO { fooBar.hello(2) })
             io()
             verify(fooBar, times(n)).hello(2)
+        }
+
+        @Test
+        fun doWhileDoesNotOverflowTheStack() {
+            val N = 100000
+            var n = N
+            val fooBar = mock(FooBar::class.java)
+            val io = IO.doWhile({ n -= 1; n > 0 }, IO { fooBar.hello(2) })
+            io()
+            verify(fooBar, times(N)).hello(2)
         }
     }
 

@@ -64,12 +64,12 @@ sealed class Heap<A> {
     operator fun plus(element: A): Heap<A> = merge(this, Heap(element, this.comparator))
 
     private fun tail(): Result<Heap<A>> = when (this) {
-        is Heap.H -> Result(merge(lt, rg))
+        is H -> Result(merge(lt, rg))
         else -> Result.failure("tail called on empty heap")
     }
 
     fun get(index: Int): Result<A> = when (this) {
-        is Heap.H -> when (index) {
+        is H -> when (index) {
             0 -> head
             else -> this.tail().flatMap { it.get(index - 1) }
         }
@@ -77,7 +77,7 @@ sealed class Heap<A> {
     }
 
     fun pop(): Option<Pair<A, Heap<A>>> = when (this) {
-        is Heap.H -> Option.Some(Pair(hd, merge(lt, rg)))
+        is H -> Option.Some(Pair(hd, merge(lt, rg)))
         else -> Option.None as Option<Pair<A, Heap<A>>>
     }
 

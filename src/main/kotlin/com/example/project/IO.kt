@@ -1,5 +1,7 @@
 package com.example.project
 
+import com.example.project.option.Option
+
 class IO<A>(private val f: () -> A) {
     operator fun invoke() = f()
     operator fun plus(io: IO<A>): IO<A> = IO {
@@ -15,12 +17,12 @@ class IO<A>(private val f: () -> A) {
         fun <A> repeat(n: Int, io: IO<A>): IO<LinkedList<A>> = IO {
             myRange(0, n).map { io() }
         }
-        /*
-        fun <A> doWhile(f: (A) -> Boolean, io: IO<A>) = unfold(LinkedList.Nil) {
 
+        fun <A> doWhile(f: (A) -> Boolean, io: IO<A>) = IO {
+            unfold(true) {
+                if (it) io().let { ioa -> Option(Pair(ioa, f(ioa))) } else Option()
+            }
         }
-
-         */
 
     }
 }
