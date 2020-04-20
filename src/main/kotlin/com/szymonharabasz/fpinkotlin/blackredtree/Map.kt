@@ -1,7 +1,7 @@
-package com.example.project.blackredtree
+package com.szymonharabasz.fpinkotlin.blackredtree
 
-import com.example.project.LinkedList
-import com.example.project.result.Result
+import com.szymonharabasz.fpinkotlin.LinkedList
+import com.szymonharabasz.fpinkotlin.result.Result
 
 typealias MyMapEntry<K, V> = MapEntry<Int, LinkedList<Pair<K, V>>>
 
@@ -35,7 +35,7 @@ class Map<K: Any, V>(
             g: (B) -> (B) -> B): B = delegate.foldLeft(identity, f, g)
 
     private fun getAll(key: K): Result<LinkedList<Pair<K, V>>> =
-            delegate[MapEntry.Companion.invoke(key.hashCode())].flatMap { x ->
+            delegate[MapEntry.invoke(key.hashCode())].flatMap { x ->
                 x.value.map { list ->
                     list.map { it }
                 }
@@ -113,7 +113,7 @@ private constructor(internal val key: K, val value: Result<V>): Comparable<MapEn
     override fun toString(): String = "MapEntry($key, $value)"
 
     override fun equals(other: Any?): Boolean = this === other || when (other) {
-        is MapEntry<*,*> -> key == other.key
+        is MapEntry<*, *> -> key == other.key
         else -> false
     }
 

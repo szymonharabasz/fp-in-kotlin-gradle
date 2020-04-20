@@ -1,6 +1,6 @@
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
-import com.example.project.option.Option
+import com.szymonharabasz.fpinkotlin.option.Option
 
 class IO<A>(private val f: () -> A) {
     operator fun invoke() = f()

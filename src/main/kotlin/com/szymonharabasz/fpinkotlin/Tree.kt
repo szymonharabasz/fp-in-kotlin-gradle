@@ -1,7 +1,7 @@
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
-import com.example.project.result.Result
-import com.example.project.result.lift2
+import com.szymonharabasz.fpinkotlin.result.Result
+import com.szymonharabasz.fpinkotlin.result.lift2
 import kotlin.IllegalStateException
 
 sealed class Tree<A: Comparable<A>> {
@@ -13,7 +13,7 @@ sealed class Tree<A: Comparable<A>> {
 
     operator fun plus(a: A): Tree<A> {
         fun plusUnbalanced(tree: Tree<A>, a: A): Tree<A> = when (tree) {
-            Empty -> T(Empty as Tree<A>, a, Empty as Tree<A>)
+            Empty -> T(Companion(), a, Companion())
             is T -> when {
                 a < tree.value -> T(tree.left.plus(a), tree.value, tree.right)
                 a > tree.value -> T(tree.left, tree.value, tree.right.plus(a))
@@ -49,10 +49,10 @@ sealed class Tree<A: Comparable<A>> {
                 Empty -> t1
                 is T -> when {
                     t2.value > t1.value -> T(t1.left, t1.value, t1.right
-                            .merge(T(Empty as Tree<A>, t2.value, t2.right)))
+                            .merge(T(Companion(), t2.value, t2.right)))
                             .merge(t2.left)
                     t2.value < t1.value -> T(t1.left
-                            .merge(T(t2.left, t2.value, Empty as Tree<A>)), t1.value, t1.right)
+                            .merge(T(t2.left, t2.value, Companion())), t1.value, t1.right)
                             .merge(t2.right)
                     else -> T(t2.left.merge(t1.left), t1.value, t2.right.merge(t1.right))
                 }
@@ -82,7 +82,7 @@ sealed class Tree<A: Comparable<A>> {
     }
 
     fun <B : Comparable<B>> map(f: (A) -> B): Tree<B> =
-            foldInOrder(Empty as Tree<B>) { t1: Tree<B> ->
+            foldInOrder(Companion()) { t1: Tree<B> ->
                 { i: A -> { t2: Tree<B> -> Companion<B>(t1, f(i), t2) } }
             }
 
@@ -154,6 +154,7 @@ sealed class Tree<A: Comparable<A>> {
 
     companion object {
 
+        @Suppress("UNCHECKED_CAST")
         operator fun <A : Comparable<A>> invoke(): Tree<A> = Empty as Tree<A>
 
         operator fun <A : Comparable<A>> invoke(list: LinkedList<A>): Tree<A> = list.coFoldRight(invoke()) { a, tree -> tree + a }
@@ -210,8 +211,8 @@ sealed class Tree<A: Comparable<A>> {
         }
 
         fun <A : Comparable<A>> balance(tree: Tree<A>): Tree<A> =
-                balanceHelper(tree.toListInOrderRight().coFoldRight(Empty as Tree<A>) { a: A, t: Tree<A> ->
-                    T(Empty as Tree<A>, a, t)
+                balanceHelper(tree.toListInOrderRight().coFoldRight(Companion()) { a: A, t: Tree<A> ->
+                    T(Companion(), a, t)
                 })
 
         private fun <A : Comparable<A>> balanceHelper(tree: Tree<A>): Tree<A> = when {
@@ -224,7 +225,7 @@ sealed class Tree<A: Comparable<A>> {
             else -> tree
         }
 
-        private fun <A : Comparable<A>> balanceFirstLevel(tree: Tree.T<A>): Tree<A> = unfold(tree) { t: Tree<A> ->
+        private fun <A : Comparable<A>> balanceFirstLevel(tree: T<A>): Tree<A> = unfold(tree) { t: Tree<A> ->
             when {
                 isUnbalanced(t) -> when {
                     tree.right.height > tree.left.height ->

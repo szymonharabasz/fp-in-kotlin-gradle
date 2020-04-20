@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v20.html
  */
 
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
 import java.lang.IllegalArgumentException
 import java.math.BigInteger
@@ -43,10 +43,10 @@ typealias UnaryIntOp = (Int) -> Int
 val composeLambda: (UnaryIntOp) -> (UnaryIntOp) -> UnaryIntOp = { f -> { g -> { x -> f(g(x))}}}
 
 // Exercise 3.5
-fun <T, U, V>lambdaGenericCompose() = { f:UnaryOp<U, V> -> { g:UnaryOp<T, U> -> { x:T -> f(g(x)) } } }
+fun <T, U, V>lambdaGenericCompose() = { f: UnaryOp<U, V> -> { g: UnaryOp<T, U> -> { x:T -> f(g(x)) } } }
 
 // Exercise 3.6
-fun <T, U, V>lambdaGenericAndThen() = { f:UnaryOp<T, U> -> { g:UnaryOp<U, V> -> { x:T -> g(f(x)) } } }
+fun <T, U, V>lambdaGenericAndThen() = { f: UnaryOp<T, U> -> { g: UnaryOp<U, V> -> { x:T -> g(f(x)) } } }
 
 // Exercise 3.7
 fun <T, U, V>partialA(f: BinaryOp<T, U, V>, a: T): UnaryOp<U, V> = f(a)
@@ -61,8 +61,11 @@ fun <T, U, V>curry(f: (T, U) -> V): BinaryOp<T, U, V> = { x -> { y -> f(x,y) }}
 fun <T, U, V>swapArgs(f: BinaryOp<T, U, V>): BinaryOp<U, T, V> = { x -> { y -> f(y)(x)}}
 
 // Exercise 4.1
+@kotlin.ExperimentalUnsignedTypes
 fun inc(n: UInt) = n + 1u
+@kotlin.ExperimentalUnsignedTypes
 fun dec(n: UInt) = n - 1u
+@kotlin.ExperimentalUnsignedTypes
 fun addCorecursive(a: UInt, b: UInt): UInt {
     tailrec fun corecursion(a: UInt, b: UInt): UInt = if (b == 0u) a else corecursion(inc(a), dec(b))
 
@@ -70,15 +73,18 @@ fun addCorecursive(a: UInt, b: UInt): UInt {
 }
 
 // Exercise 4.2
+@kotlin.ExperimentalUnsignedTypes
 fun factorialProducer(): (UInt) -> UInt {
     lateinit var fact: (UInt) -> UInt
     fact =
     { n -> if(n > 1u) n * fact(dec(n)) else 1u }
     return fact
 }
+@kotlin.ExperimentalUnsignedTypes
 val factorial = factorialProducer()
 
 // Exercise 4.3
+@kotlin.ExperimentalUnsignedTypes
 fun fibonacci(n: UInt): BigInteger {
     tailrec fun go(m: UInt, prev: BigInteger, nextPrev: BigInteger): BigInteger =
         if (m <= 1u) prev else go(dec(m), prev.add(nextPrev), prev)
@@ -121,11 +127,14 @@ fun toStringFoldRight(list: kotlin.collections.List<Char>) = list.foldRight("") 
 
 // Exercise 4.7
 fun <T> prependListContat(list: kotlin.collections.List<T>, elem: T): kotlin.collections.List<T> = listOf(elem) + list
-fun <T> reverseListConcat(list: kotlin.collections.List<T>): kotlin.collections.List<T> = list.foldLeft(listOf<T>()) { elem, list -> prependListContat(list, elem) }
+fun <T> reverseListConcat(list: kotlin.collections.List<T>): kotlin.collections.List<T> = list.foldLeft(listOf<T>()) {
+    elem, lst -> prependListContat(lst, elem) }
 
 // Exercise 4.8
-fun <T> prepend(list: kotlin.collections.List<T>, elem: T): kotlin.collections.List<T> = list.foldLeft(listOf(elem)) { e, l -> l + e }
-fun <T> reverse(list: kotlin.collections.List<T>): kotlin.collections.List<T> = list.foldLeft(listOf<T>()) { elem, list -> prepend(list, elem) }
+fun <T> prepend(list: kotlin.collections.List<T>, elem: T): kotlin.collections.List<T> = list.foldLeft(listOf(elem)) {
+    e, l -> l + e }
+fun <T> reverse(list: kotlin.collections.List<T>): kotlin.collections.List<T> = list.foldLeft(listOf<T>()) {
+    elem, lst -> prepend(lst, elem) }
 
 // Exercise 4.9
 fun rangeLoop(start: Int, end: Int): kotlin.collections.List<Int> {
@@ -169,6 +178,7 @@ fun <T> unfold(seed: T, f: (T) -> T, p: (T) -> Boolean): kotlin.collections.List
 fun rangeUnfold(start: Int, end: Int): kotlin.collections.List<Int> = unfold(start, { it + 1 }, { it < end })
 
 // Exercise 4.15
+@kotlin.ExperimentalUnsignedTypes
 fun fibonacciString(n: UInt): String {
     tailrec fun go(m: UInt, prev: BigInteger, nextPrev: BigInteger, acc: String): String =
             if (m <= 1u) acc else go(dec(m), prev.add(nextPrev), prev, "$acc, $prev")
@@ -190,12 +200,13 @@ fun <T> iterate(seed: T, f: (T) -> T, n: Int): kotlin.collections.List<T> {
 fun rangeIterate(start: Int, end: Int): kotlin.collections.List<Int> = iterate(start, { it + 1 }, end - start)
 
 // Exercise 4.17
-fun <T, U> map(list: kotlin.collections.List<T>, f: (T) -> U): kotlin.collections.List<U> = list.foldLeft(listOf()) { elem, list -> list + f(elem) }
+fun <T, U> map(list: kotlin.collections.List<T>, f: (T) -> U): kotlin.collections.List<U> = list.foldLeft(listOf()) {
+    elem, lst -> lst + f(elem) }
 
 // Exercise 4.18
 fun fibonacciStringCorecursive(n: Int): String {
     val pairs = iterate(Pair(BigInteger.valueOf(1), BigInteger.valueOf(1)),
-    { (x, y) -> Pair(y, x + y) }, n)
+            { (x, y) -> Pair(y, x + y) }, n)
     val elements = map(pairs) { x: Pair<BigInteger, BigInteger> -> x.first }
     return makeStringFoldLeft(elements, ", ")
 }

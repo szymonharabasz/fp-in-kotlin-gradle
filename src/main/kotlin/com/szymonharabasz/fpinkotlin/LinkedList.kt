@@ -1,8 +1,8 @@
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
-import com.example.project.option.Option
-import com.example.project.result.Result
-import com.example.project.result.map2
+import com.szymonharabasz.fpinkotlin.option.Option
+import com.szymonharabasz.fpinkotlin.result.Result
+import com.szymonharabasz.fpinkotlin.result.map2
 import com.sun.jdi.connect.spi.TransportService
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -73,7 +73,7 @@ sealed class LinkedList<A> {
                     throw RuntimeException(e)
                 }
             }
-            Result(result.foldLeft(identity, m))
+        Result(result.foldLeft(identity, m))
         } catch (e: Exception) {
             Result.failure<B>(e)
         }
@@ -102,20 +102,20 @@ sealed class LinkedList<A> {
 
     fun length(): Int = length
 
-    fun reverse(): LinkedList<A> = foldLeft(Nil as LinkedList<A>) { list, elem -> list.cons(elem) }
+    fun reverse(): LinkedList<A> = foldLeft(Companion()) { list, elem -> list.cons(elem) }
 
     fun init(): LinkedList<A> = when (this) {
-        Nil -> Nil as LinkedList<A>
+        Nil -> Companion()
         is Cons -> this.reverse().drop(1).reverse()
     }
 
-    fun concat(other: LinkedList<A>) = Companion.concat(this, other)
+    fun concat(other: LinkedList<A>) = concat(this, other)
 
-    fun <B> map(f: (A) -> B): LinkedList<B> = coFoldRight(Nil as LinkedList<B>) { elem, list -> list.cons(f(elem)) }
+    fun <B> map(f: (A) -> B): LinkedList<B> = coFoldRight(Companion()) { elem, list -> list.cons(f(elem)) }
 
     fun <B> flatMap(f: (A) -> LinkedList<B>): LinkedList<B> = flatten(map(f))
 
-    fun filter(p: (A) -> Boolean): LinkedList<A> = coFoldRight(Nil as LinkedList<A>) {
+    fun filter(p: (A) -> Boolean): LinkedList<A> = coFoldRight(Companion()) {
         elem, list -> if (p(elem)) list.cons(elem) else list }
 
     fun <A1, A2> unzip(f: (A) -> Pair<A1, A2>): Pair<LinkedList<A1>, LinkedList<A2>> =
@@ -127,14 +127,14 @@ sealed class LinkedList<A> {
 
     fun getAt(n: Int): Result<A> = when {
         n < 0 || n >= length -> Result.failure(IndexOutOfBoundsException())
-        else -> foldLeft(MyPair(Result<A>(), n+1), MyPair(Result<A>(), 0), { acc, elem ->
+        else -> foldLeft(MyPair(Result<A>(), n + 1), MyPair(Result<A>(), 0), { acc, elem ->
             MyPair(Result(elem), acc.second - 1)
         }).first.first
     }
 
     fun splitAt(n: Int): Pair<LinkedList<A>, LinkedList<A>> = when {
         n < 0 -> Pair(Companion<A>(), this)
-        else -> foldLeft(MyPair(Pair(Companion<A>(),this), n), MyPair(Pair(Companion<A>(),this), 0), { acc, elem ->
+        else -> foldLeft(MyPair(Pair(Companion<A>(), this), n), MyPair(Pair(Companion<A>(), this), 0), { acc, elem ->
             MyPair(Pair(acc.first.first.cons(elem), acc.first.second.drop(1)), acc.second - 1)
         }).first.first.let { Pair(it.first.reverse(), it.second) }
     }
@@ -273,14 +273,16 @@ sealed class LinkedList<A> {
 
     companion object {
 
+        @Suppress("UNCHECKED_CAST")
         operator
         fun <A> invoke(vararg az: A): LinkedList<A> =
                 az.foldRight(Nil as LinkedList<A>) { a: A, list: LinkedList<A> ->
                     Cons(a, list)
                 }
 
-        fun <A> flatten(list: LinkedList<LinkedList<A>>): LinkedList<A> = LinkedList.foldLeft(list, LinkedList.Nil as LinkedList<A>, { a, b -> a.concat(b) })
+        fun <A> flatten(list: LinkedList<LinkedList<A>>): LinkedList<A> = foldLeft(list, Companion(), { a, b -> a.concat(b) })
 
+        @Suppress("UNCHECKED_CAST")
         tailrec fun <A> drop(n: Int, decc: LinkedList<A>): LinkedList<A> = when (decc) {
             Nil -> Nil as LinkedList<A>
             is Cons -> when (n) {
@@ -290,7 +292,7 @@ sealed class LinkedList<A> {
         }
 
         tailrec fun <A> dropWhile(p: (A) -> Boolean, decc: LinkedList<A>): LinkedList<A> = when (decc) {
-            Nil -> Nil as LinkedList<A>
+            Nil -> Companion()
             is Cons -> if (p(decc.head)) dropWhile(p, decc.tail) else decc
         }
 
@@ -319,7 +321,7 @@ sealed class LinkedList<A> {
                     is Cons -> {
                         if (acc == zero) {
                             Pair(acc, list)
-                        } else {0
+                        } else {
                             coFoldRight(list.tail, initial, zero, f(list.head, acc), f)
                         }
                     }
@@ -362,11 +364,11 @@ fun <A> flattenResult(list: LinkedList<Result<A>>): LinkedList<A> = list.flatMap
 
 fun <A> sequence2(list: LinkedList<Result<A>>): Result<LinkedList<A>> =
         list.filter{ it !is Result.Empty }.reverse().foldLeft(Result(LinkedList())) { l, ra ->
-            map2(ra, l) { a -> { la: LinkedList<A> -> la.cons(a) }}
+            map2(ra, l) { a -> { la: LinkedList<A> -> la.cons(a) } }
 }
 
 fun <A, B> traverse(list: LinkedList<A>, f: (A) -> Result<B>): Result<LinkedList<B>> =
-        list.reverse().coFoldRight(Result(LinkedList<B>()), Result()) { a, l ->
+        list.coFoldRight(Result(LinkedList<B>()), Result()) { a, l ->
             map2(f(a), l) { b -> { lb: LinkedList<B> -> lb.cons(b) } }
         }.first
 
@@ -407,6 +409,7 @@ fun myRange(start: Int, end: Int): LinkedList<Int> = unfold(start) { i ->
 }
 
 data class MyPair<B>(val first: B, val second: Int) {
+    @Suppress("UNCHECKED_CAST")
     override fun equals(other: Any?): Boolean = when {
         other == null -> false
         other::class == this::class -> (other as MyPair<B>).second == second
@@ -431,8 +434,8 @@ class MyLinkedMap<K, V> {
     fun get(key: K): Result<V> = list.dropWhile { it.first != key }.headSafe().map { it.second }
 
     fun set(key: K, value: V): MyLinkedMap<K, V> = if (hasKey(key)) {
-        MyLinkedMap(list.foldLeft(LinkedList<Pair<K, V>>()) {
-            acc, elem -> if (elem.first == key) acc.cons(Pair(key, value))
+        MyLinkedMap(list.foldLeft(LinkedList<Pair<K, V>>()) { acc, elem ->
+            if (elem.first == key) acc.cons(Pair(key, value))
             else acc.cons(elem)
         })
     } else {

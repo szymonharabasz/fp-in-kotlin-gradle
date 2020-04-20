@@ -1,6 +1,6 @@
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
-import com.example.project.result.Result
+import com.szymonharabasz.fpinkotlin.result.Result
 
 class Lazy<A>(val f: () -> A) : () -> (A) {
     private val v: A by lazy { f() }
@@ -34,10 +34,10 @@ fun <A, B, C> liftLazy2(f: (A) -> (B) -> C): (Lazy<A>) -> (Lazy<B>) -> Lazy<C> =
     }
 }
 
-fun <A> sequence(list: LinkedList<Lazy<A>>): Lazy<LinkedList<A>> = Lazy{ list.map{ it() } }
+fun <A> sequence(list: LinkedList<Lazy<A>>): Lazy<LinkedList<A>> = Lazy { list.map { it() } }
 
 fun <A> sequenceResult(list: LinkedList<Lazy<A>>): Lazy<Result<LinkedList<A>>> = Lazy {
-    traverse(list) {
+    traverse(list.reverse()) {
         try {
             Result(it())
         } catch (e: Exception) {

@@ -1,11 +1,8 @@
-package com.example.project.blackredtree
+package com.szymonharabasz.fpinkotlin.blackredtree
 
-import com.example.project.blackredtree.Color.NB
-import com.example.project.blackredtree.Color.BB
-import com.example.project.blackredtree.Color.B
-import com.example.project.blackredtree.Color.R
-import com.example.project.result.Result
-import com.example.project.result.lift2
+import com.szymonharabasz.fpinkotlin.blackredtree.Color.B
+import com.szymonharabasz.fpinkotlin.blackredtree.Color.R
+import com.szymonharabasz.fpinkotlin.result.Result
 
 sealed class BlackRedTree<A: Comparable<A>> {
 
@@ -48,38 +45,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
             else -> true
         }
     }
-/*
-    fun merge(tree: BlackRedTree<A>): BlackRedTree<A> {
-        fun mergeUnbalanced(t1: BlackRedTree<A>, t2: BlackRedTree<A>): BlackRedTree<A> = when (t1) {
-            Empty -> t2
-            is T -> when (t2) {
-                Empty -> t1
-                is T -> when {
-                    t2.value > t1.value -> T(t1.left, t1.value, t1.right
-                            .merge(T(Empty as BlackRedTree<A>, t2.value, t2.right)))
-                            .merge(t2.left)
-                    t2.value < t1.value -> T(t1.left
-                            .merge(T(t2.left, t2.value, Empty as BlackRedTree<A>)), t1.value, t1.right)
-                            .merge(t2.right)
-                    else -> T(t2.left.merge(t1.left), t1.value, t2.right.merge(t1.right))
-                }
-            }
-        }
-        return balance(mergeUnbalanced(this, tree))
-    }
 
-    fun remove(a: A): BlackRedTree<A> {
-        fun removeUnbalanced(tree: BlackRedTree<A>, a: A): BlackRedTree<A> = when (tree) {
-            Empty -> tree
-            is T -> when {
-                a < tree.value -> T(tree.left.remove(a), tree.value, tree.right)
-                a > tree.value -> T(tree.left, tree.value, tree.right.remove(a))
-                else -> mergeOrdered(tree.left, tree.right)
-            }
-        }
-        return removeUnbalanced(this, a)
-    }
-*/
     fun <B> foldLeft(
             identity: B,
             f: (B) -> (A) -> B,
@@ -87,28 +53,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
         is Empty -> identity
         is T -> g(left.foldLeft(identity, f, g))(f(right.foldLeft(identity, f, g))(value))
     }
-/*
-    fun <B : Comparable<B>> map(f: (A) -> B): BlackRedTree<B> =
-            foldInOrder(Empty as BlackRedTree<B>) { t1: BlackRedTree<B> ->
-                { i: A -> { t2: BlackRedTree<B> -> Companion<B>(t1, f(i), t2) } }
-            }
 
-    fun toListInOrderRight(): LinkedList<A> = foldInOrder(LinkedList<A>()) { list1 ->
-        { a ->
-            { list2 ->
-                list1.concat(list2.cons(a))
-            }
-        }
-    }
-
-
-    abstract fun <B> foldInOrder(identity: B, f: (B) -> (A) -> (B) -> B): B
-    abstract fun <B> foldPreOrder(identity: B, f: (A) -> (B) -> (B) -> B): B
-    abstract fun <B> foldPostOrder(identity: B, f: (B) -> (B) -> (A) -> B): B
-
-    abstract fun rotateLeft(): BlackRedTree<A>
-    abstract fun rotateRight(): BlackRedTree<A>
-*/
     operator fun plus(value: A): BlackRedTree<A> = add(value).blacken()
     operator fun minus(value: A): BlackRedTree<A> = delete(value).blacken()
 
@@ -137,6 +82,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
         is T -> T(R, left, value, right)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun add(a: A): BlackRedTree<A> = when (this) {
         is Empty -> T(R, E as BlackRedTree<A>, a, E as BlackRedTree<A>)
         is T -> when {
@@ -155,6 +101,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun delete(a: A): BlackRedTree<A> = when (this) {
         is Empty -> E as BlackRedTree<A>
         is T -> when {
@@ -164,6 +111,7 @@ sealed class BlackRedTree<A: Comparable<A>> {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun remove(): BlackRedTree<A> = when {
         isTR && left.isEmpty && right.isEmpty -> E as BlackRedTree<A>
         isTB && left.isEmpty && right.isEmpty -> EE as BlackRedTree<A>
@@ -194,15 +142,6 @@ sealed class BlackRedTree<A: Comparable<A>> {
 
         override val size: Int = 0
         override val height: Int = -1
-        /*
-                override fun <B> foldInOrder(identity: B, f: (B) -> (Nothing) -> (B) -> B) = identity
-                override fun <B> foldPreOrder(identity: B, f: (Nothing) -> (B) -> (B) -> B) = identity
-                override fun <B> foldPostOrder(identity: B, f: (B) -> (B) -> (Nothing) -> B) = identity
-
-                override fun rotateLeft(): BlackRedTree<Nothing> = this
-
-                override fun rotateRight(): BlackRedTree<Nothing> = this
-        */
         override val color: Color = Color.R
         override val isB: Boolean = false
         override val isBB: Boolean = false
@@ -257,27 +196,6 @@ sealed class BlackRedTree<A: Comparable<A>> {
         override fun toString(): String = "{$color $left $value $right}"
         override val size: Int = 1 + left.size + right.size
         override val height: Int = 1 + left.height.coerceAtLeast(right.height)
-        /*
-            override fun <B> foldInOrder(identity: B, f: (B) -> (A) -> (B) -> B): B =
-                    f(left.foldInOrder(identity, f))(value)(right.foldInOrder(identity, f))
-
-            override fun <B> foldPreOrder(identity: B, f: (A) -> (B) -> (B) -> B): B =
-                    f(value)(left.foldPreOrder(identity, f))(right.foldPreOrder(identity, f))
-
-            override fun <B> foldPostOrder(identity: B, f: (B) -> (B) -> (A) -> B): B =
-                    f(left.foldPostOrder(identity, f))(right.foldPostOrder(identity, f))(value)
-
-
-            override fun rotateLeft(): BlackRedTree<A> = when (right) {
-                Empty -> this
-                is T -> T(T(left, value, right.left), right.value, right.right)
-            }
-
-            override fun rotateRight(): BlackRedTree<A> = when (left) {
-                Empty -> this
-                is T -> T(left.left, left.value, T(left.right, value, right))
-            }
-        */
         override val isB: Boolean = color == Color.B
         override val isBB: Boolean = color == Color.BB
         override val isTB: Boolean = color == Color.B || color == Color.BB
@@ -289,14 +207,9 @@ sealed class BlackRedTree<A: Comparable<A>> {
 
     companion object {
 
+        @Suppress("UNCHECKED_CAST")
         operator fun <A : Comparable<A>> invoke(): BlackRedTree<A> = E as BlackRedTree<A>
-/*
-        operator fun <A : Comparable<A>> invoke(list: LinkedList<A>): BlackRedTree<A> = list.coFoldRight(invoke()) { a, tree -> tree + a }
 
-        operator fun <A : Comparable<A>> invoke(vararg az: A): BlackRedTree<A> = az.foldRight(invoke()) { a, tree ->
-            tree + a
-        }
-*/
         private fun <A : Comparable<A>> lt(first: A, second: A): Boolean = first < second
         private fun <A : Comparable<A>> lt(first: A, second: A, third: A): Boolean =
                 lt(first, second) && lt(second, third)
@@ -305,19 +218,6 @@ sealed class BlackRedTree<A: Comparable<A>> {
         private fun <A : Comparable<A>> ordered(t1: BlackRedTree<A>, a: A, t2: BlackRedTree<A>) =
                 (t1.max() < a && a < t2.min()) || (t1.isEmpty && t2.isEmpty)
 
-
-/*
-        internal operator fun <A : Comparable<A>> invoke(left: BlackRedTree<A>, a: A, right: BlackRedTree<A>) = when {
-            ordered(left, a, right) -> T(R, left, a, right)
-            ordered(right, a, left) -> T(R, right, a, left)
-            else -> BlackRedTree(a).merge(left).merge(right)
-        }
-
-        private fun <A : Comparable<A>> mergeOrdered(t1: BlackRedTree<A>, t2: BlackRedTree<A>): BlackRedTree<A> = when (t1) {
-            Empty -> t2
-            is T -> T(t1.left, t1.value, mergeOrdered(t1.right, t2))
-        }
-*/
         fun <A> unfold(a: A, f: (A) -> Result<A>): A {
             tailrec fun <A> unfold(
                     a: Pair<Result<A>, Result<A>>,
@@ -341,44 +241,6 @@ sealed class BlackRedTree<A: Comparable<A>> {
             0 -> 0
             else -> 31 - Integer.numberOfLeadingZeros(n)
         }
-/*
-        fun <A : Comparable<A>> balance(tree: BlackRedTree<A>): BlackRedTree<A> =
-                balanceHelper(tree.toListInOrderRight().coFoldRight(Empty as BlackRedTree<A>) { a: A, t: BlackRedTree<A> ->
-                    T(Empty as BlackRedTree<A>, a, t)
-                })
-
-        private fun <A : Comparable<A>> balanceHelper(tree: BlackRedTree<A>): BlackRedTree<A> = when {
-            tree is T && tree.height > log2nlz(tree.size) -> when {
-                Math.abs(tree.left.height - tree.right.height) > 1 ->
-                    balanceHelper(balanceFirstLevel(tree))
-                else ->
-                    T(balanceHelper(tree.left), tree.value, balanceHelper(tree.right))
-            }
-            else -> tree
-        }
-
-        private fun <A : Comparable<A>> balanceFirstLevel(tree: BlackRedTree.T<A>): BlackRedTree<A> = unfold(tree) { t: BlackRedTree<A> ->
-            when {
-                isUnbalanced(t) -> when {
-                    tree.right.height > tree.left.height ->
-                        t.rotateLeft().let {
-                            when (it) {
-                                is T -> Result(it)
-                                else -> throw IllegalStateException("should never happen")
-                            }
-                        }
-                    else -> t.rotateRight().let {
-                        when (it) {
-                            is T -> Result(it)
-                            else -> throw IllegalStateException("should never happen")
-                        }
-                    }
-                }
-                else -> Result()
-            }
-        }
-
- */
 
     }
 }

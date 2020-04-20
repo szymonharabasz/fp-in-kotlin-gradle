@@ -1,9 +1,8 @@
-package com.example.project.option
+package com.szymonharabasz.fpinkotlin.option
 
-import java.lang.Exception
+import com.szymonharabasz.fpinkotlin.LinkedList
+import com.szymonharabasz.fpinkotlin.sum
 import kotlin.math.pow
-
-import com.example.project.*
 
 sealed class Option<A> {
 
@@ -21,14 +20,15 @@ sealed class Option<A> {
 
     fun orElse(default: () -> Option<A>): Option<A> = map { this }.getOrElse(default)
 
+    @Suppress("UNCHECKED_CAST")
     fun <B> map(f: (A) -> B): Option<B> = when (this) {
         is None -> None as Option<B>
         is Some -> Some(f(value))
     }
 
-    fun <B> flatMap(f: (A) -> Option<B>): Option<B> = map(f).getOrElse(Option.invoke())
+    fun <B> flatMap(f: (A) -> Option<B>): Option<B> = map(f).getOrElse(invoke())
 
-    fun filter(p: (A) -> Boolean): Option<A> = flatMap { x -> if (p(x)) this else Option.invoke() }
+    fun filter(p: (A) -> Boolean): Option<A> = flatMap { x -> if (p(x)) this else invoke() }
 
     internal object None: Option<Nothing>() {
 
@@ -49,6 +49,7 @@ sealed class Option<A> {
     }
 
     companion object {
+        @Suppress("UNCHECKED_CAST")
         operator fun <A> invoke(a: A? = null): Option<A> = when(a) {
             null -> None as Option<A>
             else -> Some(a)
@@ -57,13 +58,13 @@ sealed class Option<A> {
 }
 
 
-val mean: (com.example.project.LinkedList<Double>) -> Option<Double> = { list -> when {
+val mean: (LinkedList<Double>) -> Option<Double> = { list -> when {
         list.isEmpty() -> Option()
         else -> Option(list.sum() / list.length())
     } }
 
-val variance: (com.example.project.LinkedList<Double>) -> Option<Double> = { list ->
-    mean(list).flatMap { m -> mean(list.map {x -> (x - m).pow(2) }) }
+val variance: (LinkedList<Double>) -> Option<Double> = { list ->
+    mean(list).flatMap { m -> mean(list.map { x -> (x - m).pow(2) }) }
 }
 
 fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> = { a ->
@@ -86,12 +87,9 @@ fun <A, B, C, D> map3(a: Option<A>, b: Option<B>, c: Option<C>, f: (A) -> (B) ->
             b.flatMap { y ->
                 c.map { z -> f(x)(y)(z)} } }
 
-fun <A> sequence(list: com.example.project.LinkedList<Option<A>>): Option<com.example.project.LinkedList<A>> =
-        list.coFoldRight(Option(com.example.project.LinkedList())) { elem, list ->
-            map2(list, elem) { l: com.example.project.LinkedList<A> -> { e: A -> l.cons(e) } }
+fun <A, B> traverse(list: LinkedList<A>, f: (A) -> Option<B>): Option<LinkedList<B>> =
+        list.coFoldRight(Option(LinkedList<B>())) { elem, lst ->
+            map2(lst, f(elem)) { l: LinkedList<B> -> { e: B -> l.cons(e) } }
         }
 
-fun <A, B> traverse(list: com.example.project.LinkedList<A>, f: (A) -> Option<B>): Option<com.example.project.LinkedList<B>> =
-        list.coFoldRight(Option(com.example.project.LinkedList<B>())) { elem, list ->
-            map2(list, f(elem)) { l: com.example.project.LinkedList<B> -> { e: B -> l.cons(e) } }
-        }
+fun <A> sequence(list: LinkedList<Option<A>>): Option<LinkedList<A>> = traverse(list) { it }

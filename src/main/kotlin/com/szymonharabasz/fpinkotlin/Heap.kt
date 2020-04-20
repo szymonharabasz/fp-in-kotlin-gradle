@@ -1,7 +1,7 @@
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
-import com.example.project.option.Option
-import com.example.project.result.Result
+import com.szymonharabasz.fpinkotlin.option.Option
+import com.szymonharabasz.fpinkotlin.result.Result
 import java.lang.IllegalStateException
 
 sealed class Heap<A> {
@@ -47,6 +47,7 @@ sealed class Heap<A> {
     }
 
     open class Empty<A>(
+            @Suppress("UNCHECKED_CAST")
             override val comparator: Result<Comparator<A>> =
                     Result.Empty as Result<Comparator<A>>) : Heap<A>() {
 
@@ -76,6 +77,7 @@ sealed class Heap<A> {
         else -> Result.failure("element not found")
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun pop(): Option<Pair<A, Heap<A>>> = when (this) {
         is H -> Option.Some(Pair(hd, merge(lt, rg)))
         else -> Option.None as Option<Pair<A, Heap<A>>>

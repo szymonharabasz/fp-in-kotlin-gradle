@@ -1,4 +1,4 @@
-package com.example.project.blackredtree
+package com.szymonharabasz.fpinkotlin.blackredtree
 
 
 sealed class Color {

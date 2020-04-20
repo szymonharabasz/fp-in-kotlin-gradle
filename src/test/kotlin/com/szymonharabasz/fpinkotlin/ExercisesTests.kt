@@ -8,25 +8,24 @@
  * http://www.eclipse.org/legal/epl-v20.html
  */
 
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
-import com.example.project.blackredtree.MapEntry
-import com.example.project.blackredtree.plus
-import com.example.project.option.*
-import com.example.project.result.Result
-import org.junit.jupiter.api.*
+import com.szymonharabasz.fpinkotlin.blackredtree.plus
+import com.szymonharabasz.fpinkotlin.option.*
+import com.szymonharabasz.fpinkotlin.result.Result
 import org.junit.jupiter.api.Assertions.*
-import java.math.BigInteger
-import kotlin.IllegalStateException
-import com.example.project.option.sequence as option_sequence
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
-import com.example.project.blackredtree.Map as MyMap
+import java.math.BigInteger
+import com.szymonharabasz.fpinkotlin.blackredtree.Map as MyMap
+import com.szymonharabasz.fpinkotlin.option.sequence as option_sequence
 
 @DisplayName("ALl the tests")
 class ExercisesTests {
 
     @Nested
-    @Disabled
     inner class Chapter3 {
         @Nested
         @DisplayName("Exercise 3.1")
@@ -142,12 +141,12 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
     inner class Chapter4 {
         @Nested
         @DisplayName("Exercise 4.1")
         inner class Exercise401 {
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun isAddingPositiveIntegers() {
                 assertEquals(234u + 758u, addCorecursive(234u, 758u))
             }
@@ -157,17 +156,20 @@ class ExercisesTests {
         @DisplayName("Exercise 4.2")
         inner class Exercise402 {
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun factorialOfLessThan21Is1() {
                 assertEquals(1u, factorial(0u))
                 assertEquals(1u, factorial(1u))
             }
 
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun factorialOf2Is2() {
                 assertEquals(2u, factorial(2u))
             }
 
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun calculatesFactorialForSmallNumber() {
                 assertEquals(40320u, factorial(8u))
             }
@@ -177,17 +179,20 @@ class ExercisesTests {
         @DisplayName("Exercise 4.3")
         inner class Exercise403 {
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun fibonacciOfLessThan21Is1() {
                 assertEquals(BigInteger.valueOf(1), fibonacci(0u))
                 assertEquals(BigInteger.valueOf(1), fibonacci(1u))
             }
 
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun calculatesNumberAtLowPositionInFibonacciSeries() {
                 assertEquals(BigInteger.valueOf(55), fibonacci(9u))
             }
 
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun worksForBigNumber() {
                 assertDoesNotThrow { fibonacci(100000u) }
             }
@@ -397,17 +402,20 @@ class ExercisesTests {
         @DisplayName("Exercise 4.15")
         inner class Exercise415 {
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun returnsStringOfFIbonacciNumbers() {
                 val fibonacciNumbers = (0u until 10u).toList().map { fibonacci(it) }
                 assertEquals(makeStringFoldLeft(fibonacciNumbers, ", "), fibonacciString(10u))
             }
 
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun returnsEmptyStringForArgumentZero() {
                 assertEquals("", fibonacciString(0u))
             }
 
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun returnsStringWithOneNumberForArgumentOne() {
                 assertEquals("1", fibonacciString(1u))
             }
@@ -456,6 +464,7 @@ class ExercisesTests {
         @DisplayName("Exercise 4.18")
         inner class Exercise418 {
             @Test
+            @kotlin.ExperimentalUnsignedTypes
             fun returnsStringOfFIbonacciNumbers() {
                 val fibonacciNumbers = (0u until 10u).toList().map { fibonacci(it) }
                 assertEquals(makeStringFoldLeft(fibonacciNumbers, ", "), fibonacciStringCorecursive(10))
@@ -474,7 +483,6 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
     inner class Chapter5 {
         @Test
         fun returnsCorrectStringRepresentationOfList() {
@@ -570,7 +578,6 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
     inner class Chapter6 {
         @Test
         fun getOrElseOnNoneReturnsDefaultValue() {
@@ -629,6 +636,7 @@ class ExercisesTests {
 
         @Test
         fun liftedFunctionReturnsNoneIfExceptionIsThrown() {
+            @Suppress("UNREACHABLE_CODE")
             val myF: (Int) -> Int = { throw IllegalThreadStateException(); 3 * it }
             assertEquals(Option<Int>(), lift(myF)(Option<Int>(4)))
         }
@@ -669,43 +677,41 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
     inner class Chapter7 {
         @Test
         fun filterReturnsTheOriginalResultIfConditionIsFulfilled() {
             assertEquals(
-                    com.example.project.result.Result(4),
-                    com.example.project.result.Result(4).filter({ it % 2 == 0 }))
+                    Result(4),
+                    Result(4).filter({ it % 2 == 0 }))
         }
 
         @Test
         fun filterReturnsFailureWithCorrectStringIfConditionNotFulfilled() {
             val message = "condition not met"
             assertEquals(
-                    com.example.project.result.Result.failure<Int>(message),
-                    com.example.project.result.Result(5).filter({ it % 2 == 0 }, message))
+                    Result.failure<Int>(message),
+                    Result(5).filter({ it % 2 == 0 }, message))
         }
 
         @Test
         fun existsReturnsTrueIfConditionIsFulfilled() {
-            assertEquals(true, com.example.project.result.Result(4).exists { it % 2 == 0 })
+            assertEquals(true, Result(4).exists { it % 2 == 0 })
         }
 
         @Test
         fun existsReturnsFalseIfConditionNotFulfilled() {
-            assertEquals(false, com.example.project.result.Result(5).exists { it % 2 == 0 })
+            assertEquals(false, Result(5).exists { it % 2 == 0 })
         }
 
         @Test
-        fun failuresWithDifferentExceptionTypesAreNotEqual() {
-            assertNotEquals(
-                    com.example.project.result.Result.failure<Int>(Exception("exception")),
-                    com.example.project.result.Result.failure<Int>(NullPointerException("exception")))
+        fun failuresWithDifferentExceptionTypesAreEqualNeededForShortCircuiting() {
+            assertEquals(
+                    Result.failure<Int>(Exception("exception")),
+                    Result.failure<Int>(NullPointerException("exception")))
         }
     }
 
     @Nested
-    @Disabled
     inner class Chapter8 {
         @Test
         fun flattenListReturnsListOfValuesOfSuccess() {
@@ -1053,7 +1059,6 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
     inner class Chapter9 {
 
         @Test
@@ -1082,13 +1087,14 @@ class ExercisesTests {
         }
 
         @Test
-        fun sequenceResultIsEscaping() {
+        fun elementsAfterFailureAreNotProcessedBySequenceResult() {
             val fooBar = mock(FooBar::class.java)
 
             sequenceResult(LinkedList(
                     Lazy<Int> { val n = 1; fooBar.hello(n); n },
                     Lazy<Int> { val n = 2; fooBar.hello(n); n },
                     Lazy<Int> { val n = 3; fooBar.hello(n); n },
+                    @Suppress("UNREACHABLE_CODE")
                     Lazy<Int> { val n = 4; fooBar.hello(n); throw NullPointerException(); n },
                     Lazy<Int> { val n = 5; fooBar.hello(n); n },
                     Lazy<Int> { val n = 6; fooBar.hello(n); n }
@@ -1178,7 +1184,7 @@ class ExercisesTests {
 
         @Test
         fun headSafeOfEmptyStreamReturnsFailure() {
-            assertEquals(Result.failure<Int>("stream is empty"), Stream.Companion<Int>().headSafe())
+            assertEquals(Result.failure<Int>("stream is empty"), Stream<Int>().headSafe())
         }
 
         @Test
@@ -1242,7 +1248,6 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
     inner class Chapter10 {
 
         @Test
@@ -1437,13 +1442,13 @@ class ExercisesTests {
 
         @Test
         fun treeIsBalandedAfterBalancing () {
-            assertFalse(Tree.isUnbalanced(Tree.balance(Tree(1,2,3,4,5,6,7))))
+            assertFalse(Tree.isUnbalanced(Tree.balance(Tree(1, 2, 3, 4, 5, 6, 7))))
         }
 
         @Test
         fun rotatingRightBalancedHeight1TreeReturnsLinearTree() {
             val tree = Tree.T(Tree(1), 2, Tree(3))
-            val expected = Tree.T( Tree(), 1, Tree.T( Tree(), 2, Tree(3) ) )
+            val expected = Tree.T(Tree(), 1, Tree.T(Tree(), 2, Tree(3)))
             assertEquals(expected, tree.rotateRight())
             assertFalse(Tree.isUnbalanced(tree))
             assertTrue(Tree.isUnbalanced(tree.rotateRight()))
@@ -1452,7 +1457,7 @@ class ExercisesTests {
         @Test
         fun rotatingLeftBalancedHeight1TreeReturnsLinearTree() {
             val tree = Tree.T(Tree(1), 2, Tree(3))
-            val expected = Tree.T( Tree.T(Tree(1), 2, Tree()),3, Tree() )
+            val expected = Tree.T(Tree.T(Tree(1), 2, Tree()), 3, Tree())
             assertEquals(expected, tree.rotateLeft())
             assertFalse(Tree.isUnbalanced(tree))
             assertTrue(Tree.isUnbalanced(tree.rotateLeft()))
@@ -1468,7 +1473,6 @@ class ExercisesTests {
     }
 
     @Nested
-    @Disabled
     inner class Chapter11 {
 
         @Test
@@ -1486,7 +1490,7 @@ class ExercisesTests {
         @Test
         fun keysAreReturnedInOrder() {
             assertEquals(
-                    LinkedList(2,4,6,8,12),
+                    LinkedList(2, 4, 6, 8, 12),
                     (MyMap<Int, Int>() + Pair(4, 14) + Pair(2,22) + Pair(8, 38) + Pair(12, 412) + Pair(6, 56)).keys())
         }
 
@@ -1500,7 +1504,7 @@ class ExercisesTests {
         @Test
         fun valuesAreReturnedByOrderOfKeys() {
             assertEquals(
-                    LinkedList(22,14,56,38,412),
+                    LinkedList(22, 14, 56, 38, 412),
                     (MyMap<Int, Int>() + Pair(4, 14) + Pair(2,22) + Pair(8, 38) + Pair(12, 412) + Pair(6, 56)).values())
         }
 
@@ -1518,7 +1522,7 @@ class ExercisesTests {
             }
 
             assertEquals(
-                    LinkedList(MyInt(2),MyInt(4),MyInt(6),MyInt(8),MyInt(12)),
+                    LinkedList(MyInt(2), MyInt(4), MyInt(6), MyInt(8), MyInt(12)),
                     (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2),22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).keys())
         }
 
@@ -1536,7 +1540,7 @@ class ExercisesTests {
             }
 
             assertEquals(
-                    LinkedList(22,14,56,38,412),
+                    LinkedList(22, 14, 56, 38, 412),
                     (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2),22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).values())
         }
 
@@ -1553,7 +1557,7 @@ class ExercisesTests {
             }
 
             assertEquals(
-                    LinkedList(MyInt(6),MyInt(12),MyInt(8),MyInt(2),MyInt(4)),
+                    LinkedList(MyInt(6), MyInt(12), MyInt(8), MyInt(2), MyInt(4)),
                     (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2),22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).keys())
         }
 
@@ -1588,15 +1592,15 @@ class ExercisesTests {
             }
 
             assertEquals(
-                    LinkedList(MyInt(2),MyInt(4),MyInt(6),MyInt(8),MyInt(12)),
+                    LinkedList(MyInt(2), MyInt(4), MyInt(6), MyInt(8), MyInt(12)),
                     (MyMap<MyInt, Int>() + Pair(MyInt(4), 14) + Pair(MyInt(2),22) + Pair(MyInt(8), 38) + Pair(MyInt(12), 412) + Pair(MyInt(6), 56)).keys())
         }
 
         @Test
         fun splitWhenSplitsLinkedListBeforeTheConditionIsFulfilled() {
             assertEquals(
-                    Pair(LinkedList(2,3,4,5), LinkedList(6,7,8,9,10,11)),
-                    LinkedList(2,3,4,5,6,7,8,9,10,11).splitWhen { it % 6 == 0 }
+                    Pair(LinkedList(2, 3, 4, 5), LinkedList(6, 7, 8, 9, 10, 11)),
+                    LinkedList(2, 3, 4, 5, 6, 7, 8, 9, 10, 11).splitWhen { it % 6 == 0 }
             )
         }
 
@@ -1622,36 +1626,36 @@ class ExercisesTests {
         fun headOfHeapWithOneElementReturnsSuccess() {
             assertEquals(
                     Result(5),
-                    Heap.Companion(5).head)
+                    Heap(5).head)
         }
 
         @Test
         fun headOfHeapWithFewElementsIsSmallestOne() {
             assertEquals(
                     Result(2),
-                    (Heap.Companion(5) + 4 + 6 + 2 + 7).head)
+                    (Heap(5) + 4 + 6 + 2 + 7).head)
         }
 
         @Test
         fun getReturnsCorrectElementFromHeap() {
             assertEquals(
                     Result(6),
-                    (Heap.Companion(5) + 4 + 6 + 2 + 7).get(3))
+                    (Heap(5) + 4 + 6 + 2 + 7).get(3))
         }
 
         @Test
         fun popOnOneElementHeapRetursnSomeOfPairOfElementAndEmptyHeap() {
             assertEquals(
                     Option.Some(Pair(5, Heap.Empty<Int>())),
-                    Heap.Companion(5).pop()
+                    Heap(5).pop()
             )
         }
 
         @Test
         fun toListReturnsListOfSortedElements() {
             assertEquals(
-                    LinkedList(2,4,5,6,7),
-                    (Heap.Companion(5) + 4 + 6 + 2 + 7).toList())
+                    LinkedList(2, 4, 5, 6, 7),
+                    (Heap(5) + 4 + 6 + 2 + 7).toList())
         }
 
         @Test
@@ -1671,8 +1675,8 @@ class ExercisesTests {
             }
 
             assertEquals(
-                    LinkedList(MyInt(2),MyInt(4),MyInt(5),MyInt(6),MyInt(7)),
-                    (Heap.Companion(MyInt(5), MyComparator()) + MyInt(4) + MyInt(6) + MyInt(2) + MyInt(7)).toList())
+                    LinkedList(MyInt(2), MyInt(4), MyInt(5), MyInt(6), MyInt(7)),
+                    (Heap(MyInt(5), MyComparator()) + MyInt(4) + MyInt(6) + MyInt(2) + MyInt(7)).toList())
         }
 
         @Test
@@ -1692,8 +1696,8 @@ class ExercisesTests {
             }
 
             assertEquals(
-                    LinkedList(MyInt(2),MyInt(4),MyInt(5),MyInt(6),MyInt(7)).reverse(),
-                    (Heap.Companion(MyInt(5), MyComparator()) + MyInt(4) + MyInt(6) + MyInt(2) + MyInt(7)).toList())
+                    LinkedList(MyInt(2), MyInt(4), MyInt(5), MyInt(6), MyInt(7)).reverse(),
+                    (Heap(MyInt(5), MyComparator()) + MyInt(4) + MyInt(6) + MyInt(2) + MyInt(7)).toList())
         }
 
         @Test
@@ -1706,7 +1710,7 @@ class ExercisesTests {
 
             assertEquals(
                     LinkedList(2, 4, 5, 6, 7).reverse(),
-                    (Heap.Companion(5, MyComparator()) + 2 + 6 + 4 + 7).toList())
+                    (Heap(5, MyComparator()) + 2 + 6 + 4 + 7).toList())
         }
 
         @Test
@@ -1734,7 +1738,7 @@ class ExercisesTests {
         @Test
         fun forEachIsCalledForEachElementOfList() {
             val fooBar = mock(FooBar::class.java)
-            LinkedList(2,3,4,5,6,7).forEach { fooBar.hello(it) }
+            LinkedList(2, 3, 4, 5, 6, 7).forEach { fooBar.hello(it) }
             verify(fooBar, times(0)).hello(1)
             verify(fooBar, times(1)).hello(2)
             verify(fooBar, times(1)).hello(3)
@@ -1748,13 +1752,13 @@ class ExercisesTests {
         @Test
         fun forEachIsStackSafe() {
             val fooBar = mock(FooBar::class.java)
-            assertDoesNotThrow { myRange(0,10000).forEach { fooBar.hello(it) } }
+            assertDoesNotThrow { myRange(0, 10000).forEach { fooBar.hello(it) } }
         }
 
         @Test
         fun functionIsNotInvokedWhenIOisNotInvoked() {
             val fooBar = mock(FooBar::class.java)
-            val io = IO { fooBar.hello(2) }
+            IO { fooBar.hello(2) }
             verify(fooBar, times(0)).hello(2)
         }
 
@@ -1788,7 +1792,7 @@ class ExercisesTests {
 
         @Test
         fun doWhileDoesNotOverflowTheStack() {
-            val N = 100000
+            val N = 10000
             var n = N
             val fooBar = mock(FooBar::class.java)
             val io = IO.doWhile({ n -= 1; n > 0 }, IO { fooBar.hello(2) })
@@ -1812,7 +1816,9 @@ class FooBarComparable: FooBarImpl(), Comparable<FooBarComparable> {
 }
 
 class Tester<T> (val value: Int) {
+    @Suppress("UNUSED_PARAMETER")
     fun <T> test(t: T): Int = value + 3
+    @Suppress("UNUSED_PARAMETER")
     fun <T> test(t: T): Int
             where T: kotlin.Comparable<T> = value + 4
 }
@@ -1820,7 +1826,7 @@ operator fun <T> Tester<T>.plus(other: Tester<T>): Tester<T> =
         Tester<T>(this.value + other.value)
 @JvmName("plusComparable")
 operator fun <V> Tester<V>.plus(other: Tester<V>): Tester<V> where V: Comparable<V> =
-        Tester<V>(2*(this.value + other.value))
+        Tester<V>(2 * (this.value + other.value))
 
 open class Base <A>(val fooBar: FooBar) {
     fun action() { worker() }

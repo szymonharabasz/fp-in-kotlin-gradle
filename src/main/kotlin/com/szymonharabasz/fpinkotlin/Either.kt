@@ -1,4 +1,4 @@
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
 sealed class Either<E, A> {
 

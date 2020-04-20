@@ -1,4 +1,4 @@
-package com.example.project.result
+package com.szymonharabasz.fpinkotlin.result
 
 import java.io.Serializable
 
@@ -10,7 +10,6 @@ sealed class Result<A>: Serializable {
         override fun equals(other: Any?): Boolean {
             val result = when (other) {
                 null -> false
-                // is Failure<*> -> other.exception::class == exception::class && other.exception.message == exception.message
                 is Failure<*> -> true
                 else -> false
             }
@@ -34,10 +33,11 @@ sealed class Result<A>: Serializable {
     }
 
     fun mapEmpty(): Result<Boolean> =
-            if (this is Empty) Result(true) else Companion.failure<Boolean>("not empty map")
+            if (this is Empty) Result(true) else failure<Boolean>("not empty map")
 
     abstract fun isEmpty(): Boolean
 
+    @Suppress("UNCHECKED_CAST")
     fun <B> map(f: (A) -> B): Result<B> = when (this) {
         is Success -> try {
             Success(f(value))
@@ -49,6 +49,7 @@ sealed class Result<A>: Serializable {
 
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun <B> flatMap(f: (A) -> Result<B>): Result<B> = when (this) {
         is Success -> try {
             f(value)
@@ -73,11 +74,12 @@ sealed class Result<A>: Serializable {
     fun orElse(default: () -> Result<A>): Result<A> = map { this }.getOrElse( try {
         default()
     } catch (e: Exception) {
-        failure<A>(e) as Result<A>
+        failure<A>(e)
     })
 
     fun filter(p: (A) -> Boolean, message: String = "condition not fulfilled"): Result<A> = flatMap { a ->
-        if (p(a)) this else failure(message) }
+        if (p(a)) this else failure(message)
+    }
 
     fun exists(p: (A) -> Boolean): Boolean = map(p).getOrElse(false)
 
@@ -110,12 +112,12 @@ sealed class Result<A>: Serializable {
 
         operator fun <A> invoke(a: A? = null, p: (A) -> Boolean): Result<A> = when (a) {
             null -> Failure(NullPointerException())
-            else -> if (p(a)) Success(a) else Empty as Result<A>
+            else -> if (p(a)) Success(a) else invoke()
         }
 
         operator fun <A> invoke(a: A? = null, message: String, p: (A) -> Boolean): Result<A> = when (a) {
             null -> Failure(NullPointerException(message))
-            else -> if (p(a)) Success(a) else Empty as Result<A>
+            else -> if (p(a)) Success(a) else invoke()
         }
 
         fun <A> failure(message: String): Result<A> = Failure(IllegalStateException(message))

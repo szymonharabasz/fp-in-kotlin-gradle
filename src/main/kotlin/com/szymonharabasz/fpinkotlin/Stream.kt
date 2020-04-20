@@ -1,6 +1,6 @@
-package com.example.project
+package com.szymonharabasz.fpinkotlin
 
-import com.example.project.result.Result
+import com.szymonharabasz.fpinkotlin.result.Result
 
 sealed class Stream<A> {
 
@@ -12,7 +12,7 @@ sealed class Stream<A> {
 
     fun takeAtMost(n: Int): Stream<A> = when (this) {
         Empty -> this
-        is Cons -> if (n == 0) Empty as Stream<A> else Cons(hd, Lazy{ tl().takeAtMost(n - 1)} )
+        is Cons -> if (n == 0) Companion() else Cons(hd, Lazy { tl().takeAtMost(n - 1) })
     }
 
     fun dropAtMost(n: Int): Stream<A> {
@@ -23,10 +23,10 @@ sealed class Stream<A> {
         return go(n, this)
     }
 
-    fun takeWhile(p: (A) -> Boolean): Stream<A> = this.foldRight(Lazy{ Stream.Companion<A>() }) { a ->
+    fun takeWhile(p: (A) -> Boolean): Stream<A> = this.foldRight(Lazy { Companion<A>() }) { a ->
         { lsa: Lazy<Stream<A>> ->
             {
-                if (p(a)) cons(Lazy { a }, lsa) else Empty as Stream<A>
+                if (p(a)) cons(Lazy { a }, lsa) else Companion()
             }()
         }
 
@@ -40,11 +40,11 @@ sealed class Stream<A> {
         return go (this)
     }
 
-    fun <B> map(f: (A) -> B): Stream<B> = foldRight(Lazy{ Stream.Companion<B>() }) { a ->
-        { lsb -> cons(Lazy{ f(a) }, lsb) }
+    fun <B> map(f: (A) -> B): Stream<B> = foldRight(Lazy { Companion<B>() }) { a ->
+        { lsb -> cons(Lazy { f(a) }, lsb) }
     }
 
-    fun <B> flatMap(f: (A) -> Stream<B>): Stream<B> = foldRight(Lazy{ Stream.Companion<B>() }) { a ->
+    fun <B> flatMap(f: (A) -> Stream<B>): Stream<B> = foldRight(Lazy { Companion<B>() }) { a ->
         { lsb -> f(a).append(lsb) }
     }
 
@@ -67,7 +67,7 @@ sealed class Stream<A> {
                 }
             }
 
-    fun toList(): LinkedList<A> = Companion.toList(this, LinkedList()).reverse()
+    fun toList(): LinkedList<A> = toList(this, LinkedList()).reverse()
 
     fun exists(p: (A) -> Boolean): Boolean {
         tailrec fun go(stream: Stream<A>): Boolean = when (stream) {
@@ -77,7 +77,7 @@ sealed class Stream<A> {
         return go(this)
     }
 
-    fun headSafe(): Result<A> = foldRight(Lazy{ Result.failure<A>("stream is empty") }) { a -> { Result(a) } }
+    fun headSafe(): Result<A> = foldRight(Lazy { Result.failure<A>("stream is empty") }) { a -> { Result(a) } }
 
     fun <B> foldRight(z: Lazy<B>, f: (A) -> (Lazy<B>) -> B): B = when (this) {
         Empty -> z()
@@ -98,7 +98,7 @@ sealed class Stream<A> {
 
         override fun isEmpty(): Boolean = false
 
-        override fun head(): Result<A>  = Result(hd())
+        override fun head(): Result<A> = Result(hd())
 
         override fun tail(): Result<Stream<A>> = Result(tl())
 
@@ -108,6 +108,7 @@ sealed class Stream<A> {
 
         fun <A> cons(hd: Lazy<A>, tl: Lazy<Stream<A>>): Stream<A> = Cons(hd, tl)
 
+        @Suppress("UNCHECKED_CAST")
         operator fun <A> invoke(): Stream<A> = Empty as Stream<A>
 
         fun from(i: Int): Stream<Int> = unfold(i) { Result(Pair(it, it + 1)) }
@@ -123,9 +124,9 @@ sealed class Stream<A> {
 
         fun <A, S> unfold(z: S, f: (S) -> Result<Pair<A, S>>): Stream<A> = f(z).map { pair ->
             Cons(Lazy { pair.first }, Lazy { unfold(pair.second, f) }) as Stream<A>
-        }.getOrElse(Empty as Stream<A>)
+        }.getOrElse(Companion())
 
     }
 }
 
-fun fibs(): Stream<Int> = Stream.unfold(Pair(1,1)){ Result(Pair(it.first, Pair(it.second, it.second + it.first))) }
+fun fibs(): Stream<Int> = Stream.unfold(Pair(1, 1)) { Result(Pair(it.first, Pair(it.second, it.second + it.first))) }
